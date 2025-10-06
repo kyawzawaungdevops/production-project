@@ -21,7 +21,6 @@ resources:
 - frontend-deployment.yaml
 - frontend-service.yaml
 - storageclass.yaml
-- secrets.yaml
 - lb.yaml
 
 # We'll add these in order to avoid dependency issues:
