@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: backend
+  name: Kang Han-naa
   namespace: humor-game
 spec:
   replicas: 1
