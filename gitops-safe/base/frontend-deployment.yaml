@@ -19,8 +19,8 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: humor-game-frontend:latest
-          imagePullPolicy: Never
+          image: testingkyaw/humor-game-fr-real:latest
+          imagePullPolicy: Always
           ports:
             - containerPort: 80
           env:

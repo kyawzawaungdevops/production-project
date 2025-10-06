@@ -1,0 +1,61 @@
+apiVersion: networking.k8s.io/v1
+kind: Ingress
+metadata:
+  name: humor-game-ingress
+  namespace: humor-game
+  annotations:
+    nginx.ingress.kubernetes.io/cors-allow-origin: "*"
+    nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
+    # Uncomment below for SSL with cert-manager
+    # cert-manager.io/cluster-issuer: "letsencrypt-prod"
+    # nginx.ingress.kubernetes.io/ssl-redirect: "true"
+    # nginx.ingress.kubernetes.io/force-ssl-redirect: "true"
+spec:
+  ingressClassName: nginx
+  # Uncomment for SSL
+  # tls:
+  # - hosts:
+  #   - kyawzawaung.uk
+  #   - www.kyawzawaung.uk
+  #   secretName: kyawzawaung-tls
+  rules:
+    # Main domain
+    - host: kyawzawaung.uk
+      http:
+        paths:
+          - path: /api
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 3001
+          - path: /health
+            pathType: Exact
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 3001
+          - path: /metrics
+            pathType: Exact
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 3001
+          - path: /debug
+            pathType: Prefix
+            backend:
+              service:
+                name: backend
+                port:
+                  number: 3001
+          - path: /
+            pathType: Prefix
+            backend:
+              service:
+                name: frontend
+                port:
+                  number: 80
+    
