@@ -4,7 +4,7 @@ metadata:
   name: backend
   namespace: humor-game
 spec:
-  replicas: 1
+  replicas: 2
   selector:
     matchLabels:
       app: backend
@@ -99,4 +99,5 @@ spec:
     app: backend
   ports:
     - port: 3001
+
 
