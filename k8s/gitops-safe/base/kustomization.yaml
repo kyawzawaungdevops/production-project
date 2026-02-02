@@ -1,0 +1,40 @@
+apiVersion: kustomize.config.k8s.io/v1beta1
+kind: Kustomization
+
+metadata:
+  name: humor-game-base
+  namespace: humor-game
+
+# Base resources - BUILDING FOUNDATION FIRST
+# Start with core infrastructure, then add dependent resources
+resources:
+- configmap.yaml
+- pvc.yaml
+- postgres-init.yaml
+- security-contexts.yaml
+- redis-deployment.yaml
+- redis-service.yaml
+- postgres-deployment.yaml
+- postgres-service.yaml
+- backend-deployment.yaml
+- backend-service.yaml
+- frontend-deployment.yaml
+- frontend-service.yaml
+- storageclass.yaml
+- lb.yaml
+
+# We'll add these in order to avoid dependency issues:
+# 1. ✅ Core infrastructure (Redis, Postgres) ← COMPLETED
+# 2. ✅ Application deployments (Backend, Frontend) ← COMPLETED
+# 3. ✅ GitOps setup complete! (HPAs removed - not needed)
+
+# NO patches - keeping it simple to avoid conflicts
+# NO common labels - this prevents conflicts with your working app
+
+# Common annotations
+commonAnnotations:
+  gitops.argoproj.io/description: "Base configuration for Humor Game"
+  gitops.argoproj.io/version: "1.0.0"
+
+# No patches or transformations for now
+# This ensures your working app stays exactly as is

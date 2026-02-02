@@ -1,0 +1,50 @@
+apiVersion: argoproj.io/v1alpha1
+kind: AppProject
+metadata:
+  name: humor-game-safe
+  namespace: argocd
+spec:
+  description: Safe GitOps monitoring for Humor Game (read-only initially)
+  
+  # Source repositories - only allow your specific repo
+  sourceRepos:
+  - 'https://github.com/kyawzawaungdevops/production-project.git'
+  
+  # Destination clusters and namespaces
+  destinations:
+  - namespace: humor-game
+    server: https://kubernetes.default.svc
+  
+  # Cluster resource allow list - only allow specific resources
+  clusterResourceWhitelist:
+  - group: ''
+    kind: Namespace
+  - group: 'storage.k8s.io'
+    kind: StorageClass  # ← ADDED
+  
+  # Namespace resource allow list - be very restrictive
+  namespaceResourceWhitelist:
+  - group: ''
+    kind: ConfigMap
+  - group: 'apps'
+    kind: Deployment
+  - group: ''
+    kind: Service
+  - group: ''
+    kind: PersistentVolumeClaim
+  - group: 'networking.k8s.io'
+    kind: Ingress
+  
+  # Resource deny list - prevent dangerous operations
+  clusterResourceBlacklist:
+  - group: 'rbac.authorization.k8s.io'
+    kind: ClusterRole
+  - group: 'rbac.authorization.k8s.io'
+    kind: ClusterRoleBinding
+  
+  # Orphaned resources - don't delete anything automatically
+  orphanedResources:
+    warn: true  # Warn about orphaned resources but don't delete
+  
+  # Signature keys - none for now (we'll add later if needed)
+  signatureKeys: []
