@@ -11,4 +11,4 @@ spec:
     - port: 80
       targetPort: 80
       protocol: TCP
-      nodePort: 30085   # optional (must be between 30000–32767)
+      nodePort: 30020   # optional (must be between 30000–32767)
