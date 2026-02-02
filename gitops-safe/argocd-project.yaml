@@ -14,34 +14,7 @@ spec:
   destinations:
   - namespace: humor-game
     server: https://kubernetes.default.svc
-  
-  # Cluster resource allow list - only allow specific resources
-  clusterResourceWhitelist:
-  - group: ''
-    kind: Namespace
-  - group: 'storage.k8s.io'
-    kind: StorageClass  # ← ADDED
-  
-  # Namespace resource allow list - be very restrictive
-  namespaceResourceWhitelist:
-  - group: ''
-    kind: ConfigMap
-  - group: 'apps'
-    kind: Deployment
-  - group: ''
-    kind: Service
-  - group: ''
-    kind: PersistentVolumeClaim
-  - group: 'networking.k8s.io'
-    kind: Ingress
-  
-  # Resource deny list - prevent dangerous operations
-  clusterResourceBlacklist:
-  - group: 'rbac.authorization.k8s.io'
-    kind: ClusterRole
-  - group: 'rbac.authorization.k8s.io'
-    kind: ClusterRoleBinding
-  
+
   # Orphaned resources - don't delete anything automatically
   orphanedResources:
     warn: true  # Warn about orphaned resources but don't delete
