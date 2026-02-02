@@ -20,7 +20,7 @@ resources:
 - backend-service.yaml
 - frontend-deployment.yaml
 - frontend-service.yaml
-- storageclass.yaml
+
 
 
 # We'll add these in order to avoid dependency issues:
