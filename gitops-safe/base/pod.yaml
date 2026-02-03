@@ -1,0 +1,17 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  name: busybox-pvc-test
+  namespace: default   # change if your PVC is in another namespace
+spec:
+  containers:
+    - name: busybox
+      image: busybox
+      command: ["sh", "-c", "sleep 3600"]
+      volumeMounts:
+        - name: postgres-storage
+          mountPath: /data
+  volumes:
+    - name: postgres-storage
+      persistentVolumeClaim:
+        claimName: postgres-pvc-3
