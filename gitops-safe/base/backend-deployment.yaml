@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kanghanna
+  name: kanghanna-deployment
   namespace: humor-game
 spec:
   replicas: 4
