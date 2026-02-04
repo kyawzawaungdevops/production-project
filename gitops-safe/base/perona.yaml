@@ -1,0 +1,254 @@
+apiVersion: pxc.percona.com/v1
+kind: PerconaXtraDBCluster
+metadata:
+  namespace: wallet1
+  name: w1-exapi-restore
+  finalizers:
+    - delete-pxc-pods-in-order
+#    - delete-ssl
+#    - delete-proxysql-pvc
+#    - delete-pxc-pvc
+#  annotations:
+#    percona.com/issue-vault-token: "true"
+  annotations:
+    argocd.argoproj.io/sync-wave: "-5"
+spec:
+  crVersion: 1.14.0
+#  ignoreAnnotations:
+#    - iam.amazonaws.com/role
+#  ignoreLabels:
+#    - rack
+  secretsName: wallet1-exp-api-db-secret
+  # vaultSecretName: keyring-secret-vault
+  allowUnsafeConfigurations: true
+#  unsafeFlags:
+#    tls: false
+#    pxcSize: false
+#    proxySize: false
+#    backupIfUnhealthy: false
+
+####pause for disabling pxc-init.
+  pause: false
+  updateStrategy: RollingUpdate
+  upgradeOptions:
+    versionServiceEndpoint: https://check.percona.com
+    apply: disabled
+    schedule: "0 4 * * *"
+  pxc:
+    size: 1
+    image: percona/percona-xtradb-cluster:8.0.35-27.1
+    autoRecovery: true
+    # replicationChannels:
+    # - name: pxc1_to_pxc2
+    #   isSource: true
+    # - name: pxc2_to_pxc1
+    #   isSource: false
+    #   configuration:
+    #     sourceRetryCount: 3
+    #     sourceConnectRetry: 60
+    #     ssl: false
+    #     sslSkipVerify: true
+    #     ca: '/etc/mysql/ssl/ca.crt'
+    #   sourcesList:
+    #   - host: w1-exapi-restore-pxc-0
+    #     port: 3306
+    #     weight: 100
+    #schedulerName: mycustom-scheduler
+    readinessDelaySec: 15
+    livenessDelaySec: 600
+    configuration: |
+        [mysqld]
+        pxc_strict_mode=PERMISSIVE
+        default_authentication_plugin=caching_sha2_password
+        max_allowed_packet=16M
+        bind-address=*
+        character-set-server=UTF8
+        collation-server=utf8_general_ci
+        general_log=0
+        slow_query_log=0
+        long_query_time=10
+        innodb_use_native_aio=0
+        max_connections=2000
+        innodb_buffer_pool_size=2147483648
+        wsrep_auto_increment_control=OFF
+        wsrep_debug=CLIENT
+        wsrep_provider_options="gcache.size=1G; gcache.recover=yes"
+        [sst]
+        xbstream-opts=--decompress
+        [xtrabackup]
+        compress
+
+    logrotate:
+      enabled: true
+      size: 100M
+      rotate: 5
+      compress: true
+      missingok: true
+      notifempty: true
+      
+      # [xtrabackup]
+      # compress=lz4
+      # for PXC 5.7
+
+    imagePullPolicy: IfNotPresent
+    resources:
+      requests:
+        memory: 1G
+        cpu: 600m
+    affinity:
+      antiAffinityTopologyKey: "kubernetes.io/hostname"
+      advanced:
+        "nodeAffinity":
+          "requiredDuringSchedulingIgnoredDuringExecution":
+            "nodeSelectorTerms":
+            - "matchExpressions":
+              - "key": "workload-class.mojaloop.io/RDBMS-CENTRAL-LEDGER-LIVE"
+                "operator": "In"
+                "values":
+                - "enabled"
+    podDisruptionBudget:
+      maxUnavailable: 1
+#      minAvailable: 0
+    volumeSpec:
+#      emptyDir: {}
+#      hostPath:
+#        path: /data
+#        type: Directory
+      persistentVolumeClaim:
+        storageClassName: longhorn
+#        accessModes: [ "ReadWriteOnce" ]
+#        dataSource:
+#          name: new-snapshot-test
+#          kind: VolumeSnapshot
+#          apiGroup: snapshot.storage.k8s.io
+        resources:
+          requests:
+            storage: 5Gi
+    gracePeriod: 600
+#    lifecycle:
+#      preStop:
+#        exec:
+#          command: [ "/bin/true" ]
+#      postStart:
+#        exec:
+#          command: [ "/bin/true" ]
+  haproxy:
+    enabled: true
+    size: 1
+    image: percona/percona-xtradb-cluster-operator:1.14.0-haproxy
+    imagePullPolicy: IfNotPresent
+    resources:
+      requests:
+        memory: 1G
+        cpu: 600m
+
+    affinity:
+      antiAffinityTopologyKey: "kubernetes.io/hostname"
+
+    podDisruptionBudget:
+      maxUnavailable: 1
+#      minAvailable: 0
+    gracePeriod: 30
+#    lifecycle:
+#      preStop:
+#        exec:
+#          command: [ "/bin/true" ]
+#      postStart:
+#        exec:
+#          command: [ "/bin/true" ]
+  proxysql:
+    enabled: false
+    size: 3
+    image: percona/proxysql2:2.5.5
+    imagePullPolicy: IfNotPresent
+
+  logcollector:
+    enabled: true
+    image: percona/percona-xtradb-cluster-operator:1.14.0-logcollector
+#    configuration: |
+#      [OUTPUT]
+#           Name  es
+#           Match *
+#           Host  192.168.2.3
+#           Port  9200
+#           Index my_index
+#           Type  my_type
+    resources:
+      requests:
+        memory: 100M
+        cpu: 200m
+    volumeMounts:
+    - name: logrotate-config
+      mountPath: /opt/percona/logrotate/      
+      readOnly: true
+    volumes:
+    - name: logrotate-config
+      configMap:
+        name: pxc-logrotate-config
+  pmm:
+    enabled: false
+---
+apiVersion: pxc.percona.com/v1
+kind: PerconaXtraDBClusterRestore
+metadata:
+  name: w1-exp-api-restore
+  namespace: wallet1
+spec:
+  pxcCluster: w1-exapi-restore
+  # backupName: exp-api-db-backup
+
+#   containerOptions:
+#     env:
+#     - name: VERIFY_TLS
+#       value: "false"
+# #      
+#    args:
+#      xtrabackup:
+#      - "--someflag=abc"
+#      xbcloud:
+#      - "--someflag=abc"
+#      xbstream:
+#      - "--someflag=abc"
+  resources:
+    requests:
+      memory: 100M
+      cpu: 100m
+    limits:
+      memory: 200M
+      cpu: 200m
+  backupSource:
+    verifyTLS: true
+    destination: s3://stg-exp-api-db-backups-wallet1/wallet1-exp-api-db-2026-01-21-15:26:02-full
+    s3:
+      bucket: stg-exp-api-db-backups-wallet1
+      credentialsSecret: percona-s3-credentials-exp-api-db
+      endpointUrl: "https://s3.af-south-1.amazonaws.com"
+      region: af-south-1
+    compression: zstd
+      # objectName: wallet1-exp-api-db-pxc-2026-01-18-11-43-xtrabackup.stream/
+
+
+---
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: pxc-logrotate-config
+  namespace: wallet1
+data:
+  logrotate-mysql.conf: |
+    /var/lib/mysql/[!G]*.log {
+      daily
+      minsize 10M
+      maxsize 100M
+      rotate 5
+      missingok
+      notifempty
+      compress
+      delaycompress
+      nocompresscmd
+      sharedscripts
+      postrotate
+        /usr/local/bin/postrotate-mysql.sh
+      endscript
+    }
+---
