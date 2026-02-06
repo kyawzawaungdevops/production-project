@@ -19,7 +19,7 @@ spec:
     spec:
       containers:
         - name: frontend
-          image: testingkyaw/application-fr-real:latest
+          image: testingkyaw/humor-game-fr-real:latest
           imagePullPolicy: Always
           ports:
             - containerPort: 80
