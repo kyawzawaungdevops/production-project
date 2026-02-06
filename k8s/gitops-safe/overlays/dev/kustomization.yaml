@@ -2,8 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 metadata:
-  name: humor-game-dev
-  namespace: humor-game
+  name: application-dev
+  namespace: application
 
 # This is a MONITORING-ONLY setup - it won't modify your working app
 # It just tracks what's different between Git and your cluster
@@ -18,14 +18,14 @@ resources: []
 
 # Common labels for tracking
 commonLabels:
-  app.kubernetes.io/name: humor-game
+  app.kubernetes.io/name: application
   app.kubernetes.io/instance: dev
   app.kubernetes.io/part-of: gitops-demo
   app.kubernetes.io/managed-by: argocd
 
 # Common annotations for tracking
 commonAnnotations:
-  argocd.argoproj.io/tracking-id: humor-game-monitor:/kustomization.yaml
+  argocd.argoproj.io/tracking-id: application-monitor:/kustomization.yaml
   gitops.argoproj.io/description: "Safe GitOps monitoring for Humor Game"
 
 # No patches or transformations for now

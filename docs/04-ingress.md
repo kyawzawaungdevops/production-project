@@ -85,18 +85,18 @@ kubectl apply -f k8s/ingress.yaml
 
 **Expected Output:**
 ```bash
-ingress.networking.k8s.io/humor-game-ingress configured
+ingress.networking.k8s.io/application-ingress configured
 ```
 
 ```bash
 # Verify ingress is configured
-kubectl get ingress -n humor-game
+kubectl get ingress -n application
 ```
 
 **Expected Output:**
 ```bash
 NAME                 CLASS   HOSTS           ADDRESS      PORTS   AGE
-humor-game-ingress   nginx   gameapp.local   172.18.0.3   80      2m
+application-ingress   nginx   gameapp.local   172.18.0.3   80      2m
 ```
 
 ### Step 2: Configure Local Domain and Test Access
@@ -178,14 +178,14 @@ open http://gameapp.local:8080
 
 ```bash
 # Check ingress status
-kubectl get ingress -n humor-game
-# Should show: humor-game-ingress with nginx class
+kubectl get ingress -n application
+# Should show: application-ingress with nginx class
 ```
 
 **Expected Output:**
 ```bash
 NAME                 CLASS   HOSTS           ADDRESS      PORTS   AGE
-humor-game-ingress   nginx   gameapp.local   172.18.0.3   80      13m
+application-ingress   nginx   gameapp.local   172.18.0.3   80      13m
 ```
 
 ```bash
@@ -204,7 +204,7 @@ ingress-nginx-controller-5445788fcd-qn4x2   1/1     Running     0          73s
 
 ```bash
 # Verify ingress rules
-kubectl describe ingress humor-game-ingress -n humor-game
+kubectl describe ingress application-ingress -n application
 # Should show rules for gameapp.local
 ```
 
@@ -248,7 +248,7 @@ curl -H "Host: gameapp.local" http://localhost:8080/metrics
 **Ingress Status:**
 ```bash
 NAME                 CLASS   HOSTS           ADDRESS      PORTS   AGE
-humor-game-ingress   nginx   gameapp.local   172.18.0.3   80      13m
+application-ingress   nginx   gameapp.local   172.18.0.3   80      13m
 ```
 
 **Ingress Controller Status:**
@@ -345,7 +345,7 @@ If you need to start over or fix issues:
 
 ```bash
 # Remove ingress rules
-kubectl delete ingress humor-game-ingress -n humor-game
+kubectl delete ingress application-ingress -n application
 
 # Remove ingress controller (nuclear option)
 kubectl delete namespace ingress-nginx

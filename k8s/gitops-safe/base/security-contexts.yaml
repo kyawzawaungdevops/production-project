@@ -5,7 +5,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: security-contexts
-  namespace: humor-game
+  namespace: application
 data:
   # Pod Security Standards configuration
   pod-security-standards: |

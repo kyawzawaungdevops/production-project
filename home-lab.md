@@ -87,11 +87,11 @@ k3d cluster create homelab --servers 1 --agents 2 --port "8080:80@loadbalancer" 
 
 # Reset specific milestone
 # Milestone 1: docker-compose down -v
-# Milestone 2: kubectl delete namespace humor-game
+# Milestone 2: kubectl delete namespace application
 # Milestone 3: kubectl delete namespace ingress-nginx
 # Milestone 4: kubectl delete namespace monitoring
 # Milestone 5: kubectl delete namespace argocd
-# Milestone 6: kubectl delete hpa,networkpolicy --all -n humor-game
+# Milestone 6: kubectl delete hpa,networkpolicy --all -n application
 
 # Check current status
 ./scripts/verify.sh
@@ -100,7 +100,7 @@ k3d cluster create homelab --servers 1 --agents 2 --port "8080:80@loadbalancer" 
 ## ✅ **Checkpoint**
 
 Your homelab is production-ready when:
-- ✅ **4 pods running** in humor-game namespace (postgres, redis, backend, frontend)
+- ✅ **4 pods running** in application namespace (postgres, redis, backend, frontend)
 - ✅ **Monitoring stack** in monitoring namespace (prometheus, grafana)
 - ✅ **GitOps automation** in argocd namespace
 - ✅ **Global access** via Ingress and domain routing
@@ -111,7 +111,7 @@ Your homelab is production-ready when:
 ## 🎉 **Success Metrics**
 
 **By the end, you'll have:**
-- ✅ **4 pods running** in humor-game namespace (postgres, redis, backend, frontend)
+- ✅ **4 pods running** in application namespace (postgres, redis, backend, frontend)
 - ✅ **Monitoring stack** in monitoring namespace (prometheus, grafana)
 - ✅ **GitOps automation** in argocd namespace
 - ✅ **Global access** via Cloudflare CDN

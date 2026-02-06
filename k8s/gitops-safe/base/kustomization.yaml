@@ -2,8 +2,8 @@ apiVersion: kustomize.config.k8s.io/v1beta1
 kind: Kustomization
 
 metadata:
-  name: humor-game-base
-  namespace: humor-game
+  name: application-base
+  namespace: application
 
 # Base resources - BUILDING FOUNDATION FIRST
 # Start with core infrastructure, then add dependent resources

@@ -7,7 +7,7 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: unified-app-ingress
-  namespace: humor-game
+  namespace: application
   annotations:
     # Disable SSL redirect for tunnel hosts
     nginx.ingress.kubernetes.io/ssl-redirect: "false"

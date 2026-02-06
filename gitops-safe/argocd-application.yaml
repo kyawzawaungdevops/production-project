@@ -1,12 +1,12 @@
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: humor-game-monitor
+  name: application-monitor
   namespace: argocd
   finalizers:
   - resources-finalizer.argocd.argoproj.io
 spec:
-  project: humor-game-safe
+  project: application-safe
   
   # Source - your Git repository
   source:
@@ -17,7 +17,7 @@ spec:
   # Destination - your app namespace
   destination:
     server: https://kubernetes.default.svc
-    namespace: humor-game
+    namespace: application
   
   # Sync policy - MANUAL ONLY for safety
   syncPolicy:

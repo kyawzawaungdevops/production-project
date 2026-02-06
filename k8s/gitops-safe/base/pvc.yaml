@@ -2,7 +2,7 @@ apiVersion: v1
 kind: PersistentVolumeClaim
 metadata:
   name: postgres-pvc
-  namespace: humor-game
+  namespace: application
 spec:
   accessModes:
     - ReadWriteOnce

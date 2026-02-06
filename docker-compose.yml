@@ -4,7 +4,7 @@ services:
   # PostgreSQL Database
   postgres:
     image: postgres:15-alpine
-    container_name: humor-game-postgres
+    container_name: application-postgres
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_NAME:-humor_memory_game}
@@ -29,7 +29,7 @@ services:
   # Redis Cache
   redis:
     image: redis:7-alpine
-    container_name: humor-game-redis
+    container_name: application-redis
     restart: unless-stopped
     command: redis-server --appendonly yes --requirepass ${REDIS_PASSWORD:-gamepass123}
     volumes:
@@ -53,7 +53,7 @@ services:
       dockerfile: Dockerfile
       args:
         BUILDKIT_INLINE_CACHE: 0
-    container_name: humor-game-backend
+    container_name: application-backend
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-development}
@@ -100,7 +100,7 @@ services:
       dockerfile: Dockerfile
       args:
         BUILDKIT_INLINE_CACHE: 0
-    container_name: humor-game-frontend
+    container_name: application-frontend
     restart: unless-stopped
     environment:
       NODE_ENV: ${NODE_ENV:-development}
@@ -161,7 +161,7 @@ networks:
 #     volumes:
 #       - ./frontend/src:/app/src:ro
 #     networks:
-#       - humor-game-network
+#       - application-network
 
 #   # Backend - Node.js API
 #   backend:
@@ -189,7 +189,7 @@ networks:
 #       - /app/node_modules
 #     command: npm run dev
 #     networks:
-#       - humor-game-network
+#       - application-network
 
 #   # PostgreSQL Database
 #   postgres:
@@ -204,7 +204,7 @@ networks:
 #       - postgres_data:/var/lib/postgresql/data
 #       - ./database/combined-init.sql:/docker-entrypoint-initdb.d/01-combined-init.sql
 #     networks:
-#       - humor-game-network
+#       - application-network
 #     healthcheck:
 #       test: ["CMD-SHELL", "pg_isready -U gameuser -d humor_memory_game"]
 #       interval: 10s
@@ -219,7 +219,7 @@ networks:
 #     volumes:
 #       - redis_data:/data
 #     networks:
-#       - humor-game-network
+#       - application-network
 #     healthcheck:
 #       test: ["CMD", "redis-cli", "ping"]
 #       interval: 10s
@@ -228,7 +228,7 @@ networks:
 #     command: redis-server --appendonly yes
 
 # networks:
-#   humor-game-network:
+#   application-network:
 #     driver: bridge
 
 # volumes:

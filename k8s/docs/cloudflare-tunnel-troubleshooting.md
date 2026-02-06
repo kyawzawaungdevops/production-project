@@ -50,7 +50,7 @@ curl -I "http://172.20.10.3:8080"
 lsof -i :8080
 
 # Verify your k3d cluster's external IPs
-kubectl get service -n ingress-nginx humor-game-ingress-ingress-nginx-controller
+kubectl get service -n ingress-nginx application-ingress-ingress-nginx-controller
 ```
 
 #### Step 4: Identify Configuration Mismatch
@@ -140,7 +140,7 @@ DNS is working correctly, but the tunnel's internal routing is pointing to the w
 **Solution:**
 1. **Check current k3d external IPs:**
    ```bash
-   kubectl get service -n ingress-nginx humor-game-ingress-ingress-nginx-controller
+   kubectl get service -n ingress-nginx application-ingress-ingress-nginx-controller
    ```
 2. **Update tunnel configuration** with new IPs
 3. **Verify port mapping** (e.g., `8080:80` in k3d config)

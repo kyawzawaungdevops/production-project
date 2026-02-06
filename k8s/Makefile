@@ -46,7 +46,7 @@ deploy-app: ## Deploy the main application (postgres, redis, backend, frontend)
 	kubectl apply -f k8s/frontend.yaml
 	kubectl apply -f k8s/ingress.yaml
 	@echo "⏳ Waiting for pods to be ready..."
-	kubectl wait --for=condition=Ready pods --all -n humor-game --timeout=300s
+	kubectl wait --for=condition=Ready pods --all -n application --timeout=300s
 	@echo "✅ Application deployed!"
 
 deploy-monitoring: ## Deploy Prometheus and Grafana monitoring stack
@@ -94,7 +94,7 @@ verify: ## Verify all deployments and run health checks
 	kubectl get nodes
 	@echo ""
 	@echo "🎮 Application Pods:"
-	kubectl get pods -n humor-game
+	kubectl get pods -n application
 	@echo ""
 	@echo "📊 Monitoring Pods:"
 	kubectl get pods -n monitoring
@@ -106,8 +106,8 @@ verify: ## Verify all deployments and run health checks
 	kubectl get ingress -A
 	@echo ""
 	@echo "🔒 Security Status:"
-	kubectl get hpa -n humor-game
-	kubectl get networkpolicy -n humor-game
+	kubectl get hpa -n application
+	kubectl get networkpolicy -n application
 
 test-endpoints: ## Test application endpoints
 	@echo "🧪 Testing application endpoints..."
@@ -125,10 +125,10 @@ check-resources: ## Check resource usage and limits
 	kubectl top nodes || echo "⚠️  Metrics server not ready"
 	@echo ""
 	@echo "🔋 Pod Resources:"
-	kubectl top pods -n humor-game || echo "⚠️  Metrics server not ready"
+	kubectl top pods -n application || echo "⚠️  Metrics server not ready"
 	@echo ""
 	@echo "📈 HPA Status:"
-	kubectl get hpa -n humor-game
+	kubectl get hpa -n application
 
 verify-all: verify test-endpoints check-resources ## Run complete verification suite
 	@echo ""
@@ -138,7 +138,7 @@ verify-all: verify test-endpoints check-resources ## Run complete verification s
 
 clean-app: ## Remove application components
 	@echo "🧹 Cleaning application..."
-	kubectl delete namespace humor-game --ignore-not-found=true
+	kubectl delete namespace application --ignore-not-found=true
 	@echo "✅ Application cleaned!"
 
 clean-monitoring: ## Remove monitoring stack
@@ -169,7 +169,7 @@ clean-all: clean-cluster ## Nuclear option - remove everything
 
 logs-app: ## Show application logs
 	@echo "📋 Application Logs:"
-	kubectl logs -l app=backend -n humor-game --tail=50
+	kubectl logs -l app=backend -n application --tail=50
 
 logs-monitoring: ## Show monitoring logs
 	@echo "📋 Monitoring Logs:"
@@ -198,7 +198,7 @@ debug-pods: ## Show detailed pod information for troubleshooting
 	@echo "🔍 Pod Debug Information:"
 	@echo ""
 	@echo "🎮 Application Pods:"
-	kubectl describe pods -n humor-game
+	kubectl describe pods -n application
 	@echo ""
 	@echo "📊 Monitoring Pods:"
 	kubectl describe pods -n monitoring
@@ -228,7 +228,7 @@ status: ## Show comprehensive system status
 	kubectl cluster-info --context k3d-dev-cluster | head -3
 	@echo ""
 	@echo "📦 Namespaces:"
-	kubectl get namespaces | grep -E "(humor-game|monitoring|argocd|ingress-nginx)"
+	kubectl get namespaces | grep -E "(application|monitoring|argocd|ingress-nginx)"
 	@echo ""
 	@echo "🏃 Running Pods:"
 	kubectl get pods --all-namespaces | grep -v "kube-system"
@@ -261,8 +261,8 @@ examples: ## Show useful example commands
 	@echo "💡 Useful Example Commands:"
 	@echo ""
 	@echo "🔍 Debug failing pod:"
-	@echo "  kubectl describe pod POD_NAME -n humor-game"
-	@echo "  kubectl logs POD_NAME -n humor-game"
+	@echo "  kubectl describe pod POD_NAME -n application"
+	@echo "  kubectl logs POD_NAME -n application"
 	@echo ""
 	@echo "🧪 Test application:"
 	@echo "  curl -H 'Host: gameapp.local' http://localhost:8080/api/health"
@@ -270,7 +270,7 @@ examples: ## Show useful example commands
 	@echo ""
 	@echo "📊 Monitor resources:"
 	@echo "  kubectl top nodes"
-	@echo "  kubectl top pods -n humor-game"
+	@echo "  kubectl top pods -n application"
 	@echo ""
 	@echo "🔄 Force pod restart:"
-	@echo "  kubectl rollout restart deployment/backend -n humor-game"
+	@echo "  kubectl rollout restart deployment/backend -n application"

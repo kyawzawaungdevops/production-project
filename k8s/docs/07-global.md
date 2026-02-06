@@ -34,7 +34,7 @@ curl -H "Host: gameapp.local" -s http://localhost:8080/api/health | jq .
 
 # Check resource usage
 kubectl top nodes
-kubectl top pods -n humor-game
+kubectl top pods -n application
 
 # Expected output: healthy status and low resource usage
 ```
@@ -46,7 +46,7 @@ kubectl top pods -n humor-game
 kubectl apply -f k8s/hpa.yaml
 
 # Verify HPA is working
-kubectl get hpa -n humor-game
+kubectl get hpa -n application
 
 # Expected output: backend-hpa and frontend-hpa created
 ```
@@ -144,7 +144,7 @@ ps aux | grep cloudflared
 Add production domains to `k8s/ingress.yaml`:
 
 ```yaml
-# Add these rules to the humor-game-ingress
+# Add these rules to the application-ingress
     # Production domain
     - host: gameapp.games
       http:
@@ -251,7 +251,7 @@ kubectl rollout status deployment argocd-server -n argocd --timeout=60s
 Update `k8s/monitoring-tunnel-ingress.yaml` with correct ingress class:
 ```yaml
 spec:
-  ingressClassName: nginx  # Change from humor-game-nginx
+  ingressClassName: nginx  # Change from application-nginx
 ```
 
 #### **4.4: Apply All Ingress Changes**
@@ -273,7 +273,7 @@ kubectl apply -f k8s/security-context.yaml
 kubectl apply -f k8s/network-policies.yaml
 
 # Verify network policies are created
-kubectl get networkpolicy -n humor-game
+kubectl get networkpolicy -n application
 ```
 
 ### **Phase 6: Comprehensive Testing**
@@ -432,7 +432,7 @@ cloudflared tunnel run gameapp-tunnel --loglevel debug
 
 **Symptoms**:
 ```bash
-kubectl get hpa -n humor-game
+kubectl get hpa -n application
 # Shows cpu: <unknown>/70%, memory: <unknown>/80%
 ```
 
@@ -447,7 +447,7 @@ kubectl top nodes
 ```bash
 # Metrics will populate after a few minutes
 # Check again after 2-3 minutes
-kubectl get hpa -n humor-game
+kubectl get hpa -n application
 
 # If still unknown, check metrics server logs
 kubectl logs -l k8s-app=metrics-server -n kube-system
@@ -462,28 +462,28 @@ kubectl logs -l k8s-app=metrics-server -n kube-system
 **Diagnosis**:
 ```bash
 # Check network policies
-kubectl get networkpolicy -n humor-game
-kubectl describe networkpolicy backend-network-policy -n humor-game
+kubectl get networkpolicy -n application
+kubectl describe networkpolicy backend-network-policy -n application
 
 # Test connectivity
-kubectl exec -it deploy/backend -n humor-game -- curl postgres:5432
+kubectl exec -it deploy/backend -n application -- curl postgres:5432
 ```
 
 **Solution**:
 ```bash
 # Review and adjust network policies
-kubectl edit networkpolicy backend-network-policy -n humor-game
+kubectl edit networkpolicy backend-network-policy -n application
 
 # Temporarily remove to test
-kubectl delete networkpolicy --all -n humor-game
+kubectl delete networkpolicy --all -n application
 ```
 
 ## 🎯 **Quick Diagnostic Commands**
 
 ```bash
 # Application Health Check
-kubectl get pods -n humor-game
-kubectl get hpa -n humor-game
+kubectl get pods -n application
+kubectl get hpa -n application
 curl -H "Host: gameapp.local" http://localhost:8080/api/health
 
 # Tunnel Status
@@ -493,7 +493,7 @@ tail -f tunnel.log
 
 # Ingress Status
 kubectl get ingress -A
-kubectl describe ingress humor-game-ingress -n humor-game
+kubectl describe ingress application-ingress -n application
 
 # DNS Verification
 nslookup gameapp.games
@@ -541,7 +541,7 @@ open http://gameapp.local:8080
 
 # Add resource monitoring
 kubectl top nodes
-kubectl top pods -n humor-game
+kubectl top pods -n application
 ```
 
 **Expected Output:**
@@ -552,10 +552,10 @@ k3d-dev-cluster-agent-0    23m          1%     856Mi          21%
 k3d-dev-cluster-agent-1    18m          1%     789Mi          19%
 
 NAME                                    CPU(cores)   MEMORY(bytes)
-humor-game-backend-7d8f9c8f9c-abc12    12m           156Mi
-humor-game-frontend-8e9f0d1e2f-def34   5m            45Mi
-humor-game-postgres-7d8f9c8f9c-abc12   8m            89Mi
-humor-game-redis-8e9f0d1e2f-def34      3m            23Mi
+application-backend-7d8f9c8f9c-abc12    12m           156Mi
+application-frontend-8e9f0d1e2f-def34   5m            45Mi
+application-postgres-7d8f9c8f9c-abc12   8m            89Mi
+application-redis-8e9f0d1e2f-def34      3m            23Mi
 ```
 
 ### Step 2: Implement Resource Limits and Requests
@@ -564,8 +564,8 @@ humor-game-redis-8e9f0d1e2f-def34      3m            23Mi
 
 ```bash
 # Verify resources are applied (they're already there from previous milestones)
-kubectl describe deployment backend -n humor-game | grep -A 10 "Limits\|Requests"
-kubectl describe deployment frontend -n humor-game | grep -A 10 "Limits\|Requests"
+kubectl describe deployment backend -n application | grep -A 10 "Limits\|Requests"
+kubectl describe deployment frontend -n application | grep -A 10 "Limits\|Requests"
 ```
 
 **Expected Output:**
@@ -826,8 +826,8 @@ kubectl wait --for=condition=ready pod -l app=cert-manager -n cert-manager --tim
 kubectl apply -f k8s/cluster-issuer.yaml
 
 # Verify certificate is issued
-kubectl get certificate -n humor-game
-kubectl describe certificate game-tls -n humor-game
+kubectl get certificate -n application
+kubectl describe certificate game-tls -n application
 ```
 
 **Expected Output:**
@@ -839,7 +839,7 @@ game-tls   True    game-tls   5m
 **Certificate Details:**
 ```yaml
 Name:         game-tls
-Namespace:    humor-game
+Namespace:    application
 Labels:       <none>
 Annotations:  <none>
 API Version:  cert-manager.io/v1
@@ -864,7 +864,7 @@ Status:
 
 ```bash
 # Verify health checks are working
-kubectl describe deployment backend -n humor-game | grep -A 5 "Liveness\|Readiness"
+kubectl describe deployment backend -n application | grep -A 5 "Liveness\|Readiness"
 
 # Install simple monitoring stack (beginner-friendly)
 kubectl apply -f k8s/simple-monitoring.yaml
@@ -893,7 +893,7 @@ Let your application scale automatically based on load:
 kubectl apply -f k8s/hpa.yaml
 
 # Verify HPA is working
-kubectl get hpa -n humor-game
+kubectl get hpa -n application
 
 # Generate some load to test autoscaling
 kubectl run load-test --image=busybox --rm -i --tty -- sh
@@ -913,8 +913,8 @@ kubectl apply -f k8s/network-policies.yaml
 kubectl apply -f k8s/security-context.yaml
 
 # Verify security policies
-kubectl get networkpolicy -n humor-game
-kubectl describe networkpolicy -n humor-game
+kubectl get networkpolicy -n application
+kubectl describe networkpolicy -n application
 
 # Test if application still functions with policies
 curl -H "Host: gameapp.local" -s http://localhost:8080/api/health
@@ -970,14 +970,14 @@ Your production-grade setup is working when:
 
 ### Symptom: HPA shows "<unknown>" targets
 **Cause:** Metrics server not fully configured in k3d
-**Command to confirm:** `kubectl get hpa -n humor-game`
+**Command to confirm:** `kubectl get hpa -n application`
 **Fix:**
 ```bash
 # This is expected behavior for k3d - HPA is working, just waiting for metrics data
 # HPA is working, just waiting for metrics data
 
 # To verify HPA is working:
-kubectl describe hpa backend-hpa -n humor-game
+kubectl describe hpa backend-hpa -n application
 # Should show HPA configuration and status
 ```
 
@@ -987,7 +987,7 @@ kubectl describe hpa backend-hpa -n humor-game
 **Fix:**
 ```bash
 # Check network policy configuration
-kubectl describe networkpolicy -n humor-game
+kubectl describe networkpolicy -n application
 
 # If too restrictive, modify k8s/network-policies.yaml
 # Ensure frontend can reach backend (port 3001)
@@ -996,15 +996,15 @@ kubectl describe networkpolicy -n humor-game
 
 ### Symptom: Security contexts cause pods to fail
 **Cause:** Container trying to run as non-root without proper configuration
-**Command to confirm:** `kubectl describe pod <pod-name> -n humor-game`
+**Command to confirm:** `kubectl describe pod <pod-name> -n application`
 **Fix:**
 ```bash
 # Check security context configuration
-kubectl describe deployment frontend -n humor-game | grep -A 5 "Security Context"
+kubectl describe deployment frontend -n application | grep -A 5 "Security Context"
 
 # Verify containers are running as non-root users
-kubectl exec -it deployment/frontend -n humor-game -- whoami
-kubectl exec -it deployment/backend -n humor-game -- whoami
+kubectl exec -it deployment/frontend -n application -- whoami
+kubectl exec -it deployment/backend -n application -- whoami
 
 # Expected output: Should show non-root users (e.g., "nginx", "backend")
 ```
@@ -1031,11 +1031,11 @@ If you need to start over or fix issues:
 
 ```bash
 # Remove HPA (Horizontal Pod Autoscaler)
-kubectl delete hpa backend-hpa -n humor-game
-kubectl delete hpa frontend-hpa -n humor-game
+kubectl delete hpa backend-hpa -n application
+kubectl delete hpa frontend-hpa -n application
 
 # Remove network policies
-kubectl delete networkpolicy --all -n humor-game
+kubectl delete networkpolicy --all -n application
 
 # Remove cert-manager (if causing issues)
 kubectl delete namespace cert-manager
@@ -1045,13 +1045,13 @@ kubectl delete -f k8s/simple-monitoring.yaml
 kubectl apply -f k8s/simple-monitoring.yaml
 
 # Rollback deployments to previous versions
-kubectl rollout undo deployment/backend -n humor-game
-kubectl rollout undo deployment/frontend -n humor-game
+kubectl rollout undo deployment/backend -n application
+kubectl rollout undo deployment/frontend -n application
 
 # Check current status
-kubectl get all -n humor-game
-kubectl get hpa -n humor-game
-kubectl get networkpolicy -n humor-game
+kubectl get all -n application
+kubectl get hpa -n application
+kubectl get networkpolicy -n application
 ```
 
 ## Understanding Production Security
@@ -1173,7 +1173,7 @@ curl http://localhost:8080
 ```bash
 # 1. Check services are running locally
 kubectl get pods -n monitoring
-kubectl get pods -n humor-game
+kubectl get pods -n application
 
 # 2. Verify port-forwards
 kubectl port-forward svc/prometheus 9090:9090 -n monitoring &
@@ -1192,24 +1192,24 @@ cat ~/.cloudflared/config.yml | grep -A1 grafana
 **Solutions:**
 ```bash
 # 1. Check HPA status
-kubectl get hpa -n humor-game
+kubectl get hpa -n application
 
 # 2. Check metrics server
 kubectl top nodes
-kubectl top pods -n humor-game
+kubectl top pods -n application
 
 # 3. Generate load to test
 # Use the populate-game-metrics.sh script multiple times
 
 # 4. Check HPA details
-kubectl describe hpa backend-hpa -n humor-game
+kubectl describe hpa backend-hpa -n application
 ```
 
 ### **Quick Diagnostic Commands**
 
 ```bash
 # Check everything is running
-kubectl get all -n humor-game
+kubectl get all -n application
 kubectl get all -n monitoring
 
 # Check tunnel status

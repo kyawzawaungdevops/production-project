@@ -34,7 +34,7 @@ kubectl apply -f k8s/monitoring.yaml
 # 2. Start port-forwards
 kubectl port-forward svc/prometheus 9090:9090 -n monitoring &
 kubectl port-forward svc/grafana 3000:3000 -n monitoring &
-kubectl port-forward svc/backend 3001:3001 -n humor-game &
+kubectl port-forward svc/backend 3001:3001 -n application &
 
 # 3. Generate sample data
 chmod +x scripts/populate-game-metrics.sh
@@ -171,8 +171,8 @@ rate(container_cpu_usage_seconds_total[5m])
 
 **Expected Output:**
 ```json
-{container="humor-game-backend",namespace="humor-game",pod="humor-game-backend-7d8f9c8f9c-abc12"} 0.001234
-{container="humor-game-frontend",namespace="humor-game",pod="humor-game-frontend-8e9f0d1e2f-def34"} 0.000567
+{container="application-backend",namespace="application",pod="application-backend-7d8f9c8f9c-abc12"} 0.001234
+{container="application-frontend",namespace="application",pod="application-frontend-8e9f0d1e2f-def34"} 0.000567
 ```
 
 ```bash
@@ -182,8 +182,8 @@ container_memory_usage_bytes
 
 **Expected Output:**
 ```json
-{container="humor-game-backend",namespace="humor-game",pod="humor-game-backend-7d8f9c8f9c-abc12"} 156789012
-{container="humor-game-frontend",namespace="humor-game",pod="humor-game-frontend-8e9f0d1e2f-def34"} 23456789
+{container="application-backend",namespace="application",pod="application-backend-7d8f9c8f9c-abc12"} 156789012
+{container="application-frontend",namespace="application",pod="application-frontend-8e9f0d1e2f-def34"} 23456789
 ```
 
 ```bash
@@ -204,8 +204,8 @@ increase(kube_pod_container_status_restarts_total[1h])
 
 **Expected Output:**
 ```json
-{namespace="humor-game",pod="humor-game-backend-7d8f9c8f9c-abc12"} 0
-{namespace="humor-game",pod="humor-game-frontend-8e9f0d1e2f-def34"} 0
+{namespace="application",pod="application-backend-7d8f9c8f9c-abc12"} 0
+{namespace="application",pod="application-frontend-8e9f0d1e2f-def34"} 0
 ```
 
 ### Step 4: Create Your First Grafana Dashboard
@@ -258,7 +258,7 @@ Open `http://localhost:3000` and login with `admin/admin123`.
 **Panel 1: Pod CPU Usage**
 ```bash
 # Query: 
-rate(container_cpu_usage_seconds_total{namespace="humor-game"}[5m])
+rate(container_cpu_usage_seconds_total{namespace="application"}[5m])
 
 # Panel title: "Pod CPU Usage"
 # Unit: "percent (0.0-1.0)"
@@ -267,7 +267,7 @@ rate(container_cpu_usage_seconds_total{namespace="humor-game"}[5m])
 **Panel 2: Pod Memory Usage**
 ```bash
 # Query:
-container_memory_usage_bytes{namespace="humor-game"}
+container_memory_usage_bytes{namespace="application"}
 
 # Panel title: "Pod Memory Usage"  
 # Unit: "custom units: bytes"
@@ -285,7 +285,7 @@ rate(nginx_ingress_controller_requests[5m])
 **Panel 4: Pod Status**
 ```bash
 # Query:
-kube_pod_status_phase{namespace="humor-game"}
+kube_pod_status_phase{namespace="application"}
 
 # Panel title: "Pod Status"
 # Visualization: "Stat"
@@ -324,7 +324,7 @@ Now that you've imported the dashboards, you need to generate traffic to see act
 # These should already be running from previous steps, but if not:
 kubectl port-forward svc/prometheus 9090:9090 -n monitoring &
 kubectl port-forward svc/grafana 3000:3000 -n monitoring &
-kubectl port-forward svc/backend 3001:3001 -n humor-game &
+kubectl port-forward svc/backend 3001:3001 -n application &
 ```
 
 **Step 6b: Populate Sample Metrics (Recommended)**
@@ -417,7 +417,7 @@ grafana-9d8e7d6c5b-def34  1/1     Running   0          20m
 **Prometheus Targets Page (`/targets`):**
 - Should show multiple `kubernetes-pods` targets
 - All targets should display "UP" status
-- Namespace should show `humor-game` for your app pods
+- Namespace should show `application` for your app pods
 
 **Grafana Dashboard with 4 Panels:**
 - **Panel 1**: Pod CPU Usage showing real-time data
@@ -474,7 +474,7 @@ curl -s 'http://localhost:9090/api/v1/label/__name__/values' | jq '.data[]' | gr
 # All targets should show "UP" status
 
 # Verify backend pod has annotations
-kubectl get pod -n humor-game -o yaml | grep prometheus.io
+kubectl get pod -n application -o yaml | grep prometheus.io
 
 # Check if metrics endpoint responds
 curl -s http://localhost:3001/metrics | head -10
@@ -500,7 +500,7 @@ curl -s http://localhost:3001/metrics | head -10
 **Fix:**
 ```bash
 # Verify correct namespace in queries
-# Query should include: {namespace="humor-game"}
+# Query should include: {namespace="application"}
 
 # Check metric names are correct
 # In Prometheus, use "Metrics" dropdown to see available metrics

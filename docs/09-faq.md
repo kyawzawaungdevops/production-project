@@ -26,7 +26,7 @@
 **A:** k3d has its own image context separate from your local Docker daemon. The `k3d image import` command ensures the cluster can access your updated images.
 
 ### Q: What if my pods keep restarting?
-**A:** Check the logs with `kubectl logs <pod-name> -n humor-game`. Common causes are resource constraints, missing dependencies, or configuration errors.
+**A:** Check the logs with `kubectl logs <pod-name> -n application`. Common causes are resource constraints, missing dependencies, or configuration errors.
 
 ## Environment Questions
 
@@ -82,7 +82,7 @@
 **A:** The project includes security contexts (non-root containers), network policies, and RBAC. For production, you'd add things like image scanning, secret management, and compliance policies.
 
 ### Q: How do I scale this?
-**A:** The Horizontal Pod Autoscaler (HPA) automatically scales pods based on CPU/memory usage. You can also manually scale with `kubectl scale deployment backend --replicas=5 -n humor-game`
+**A:** The Horizontal Pod Autoscaler (HPA) automatically scales pods based on CPU/memory usage. You can also manually scale with `kubectl scale deployment backend --replicas=5 -n application`
 
 ## Troubleshooting Questions
 
@@ -115,7 +115,7 @@
 ## Performance Questions
 
 ### Q: Why is my application slow?
-**A:** Check resource usage with `kubectl top pods -n humor-game`. The application might be resource-constrained.
+**A:** Check resource usage with `kubectl top pods -n application`. The application might be resource-constrained.
 
 ### Q: How do I optimize performance?
 **A:** Use the monitoring dashboards to identify bottlenecks. Common optimizations include resource limits, connection pooling, and caching strategies.

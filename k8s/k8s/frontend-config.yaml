@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: frontend-config
-  namespace: humor-game
+  namespace: application
 data:
   API_BASE_URL: "/api"
   NODE_ENV: "production"

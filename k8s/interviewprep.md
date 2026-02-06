@@ -20,7 +20,7 @@
 ### **Key Metrics to Mention**
 
 - **4 microservices** (frontend, backend, PostgreSQL, Redis)
-- **3 Kubernetes namespaces** (humor-game, monitoring, argocd)
+- **3 Kubernetes namespaces** (application, monitoring, argocd)
 - **Global CDN deployment** with Cloudflare
 - **Auto-scaling** with HPA
 - **Zero-downtime deployments** via GitOps
@@ -32,7 +32,7 @@
 
 **Q: "Explain your Kubernetes deployment strategy."**
 
-**A:** *"I used a multi-namespace architecture for separation of concerns. The main application runs in the `humor-game` namespace with separate deployments for frontend (nginx), backend (Node.js), PostgreSQL, and Redis. I implemented horizontal pod autoscaling for the frontend and backend based on CPU and memory thresholds. For ingress, I used nginx-ingress-controller to handle external traffic routing with custom domain rules."*
+**A:** *"I used a multi-namespace architecture for separation of concerns. The main application runs in the `application` namespace with separate deployments for frontend (nginx), backend (Node.js), PostgreSQL, and Redis. I implemented horizontal pod autoscaling for the frontend and backend based on CPU and memory thresholds. For ingress, I used nginx-ingress-controller to handle external traffic routing with custom domain rules."*
 
 **Follow-up topics:**
 - Pod resource limits and requests
@@ -103,11 +103,11 @@
 **Interviewer:** *"Users report the application is down. Walk me through your troubleshooting process."*
 
 **Your Response:**
-1. **Check application health**: `kubectl get pods -n humor-game`
-2. **Verify services**: `kubectl get svc -n humor-game`
-3. **Check ingress**: `kubectl describe ingress humor-game-ingress -n humor-game`
+1. **Check application health**: `kubectl get pods -n application`
+2. **Verify services**: `kubectl get svc -n application`
+3. **Check ingress**: `kubectl describe ingress application-ingress -n application`
 4. **Test internal connectivity**: `kubectl exec -it pod/backend -- curl frontend:80`
-5. **Check logs**: `kubectl logs -l app=backend -n humor-game --tail=50`
+5. **Check logs**: `kubectl logs -l app=backend -n application --tail=50`
 6. **Verify external DNS**: `nslookup gameapp.games`
 
 *"I follow a systematic approach: pods → services → ingress → external connectivity. This helps isolate whether it's an application issue, networking problem, or external routing issue."*
@@ -117,11 +117,11 @@
 **Interviewer:** *"Prometheus alerts show high memory usage. How do you investigate?"*
 
 **Your Response:**
-1. **Check metrics**: `kubectl top pods -n humor-game`
-2. **Review resource limits**: `kubectl describe pod backend-xxx -n humor-game`
+1. **Check metrics**: `kubectl top pods -n application`
+2. **Review resource limits**: `kubectl describe pod backend-xxx -n application`
 3. **Analyze application metrics**: Query Prometheus for memory trends
 4. **Check for memory leaks**: Review application logs for patterns
-5. **Scale if necessary**: `kubectl scale deployment backend --replicas=3 -n humor-game`
+5. **Scale if necessary**: `kubectl scale deployment backend --replicas=3 -n application`
 
 *"I'd also check if HPA is configured correctly and investigate whether this is a temporary spike or a gradual increase indicating a memory leak."*
 

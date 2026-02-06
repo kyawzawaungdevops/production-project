@@ -9,8 +9,8 @@ on:
 
 env:
   REGISTRY: localhost:5001
-  IMAGE_NAME_BACKEND: humor-game-backend
-  IMAGE_NAME_FRONTEND: humor-game-frontend
+  IMAGE_NAME_BACKEND: application-backend
+  IMAGE_NAME_FRONTEND: application-frontend
   KUBE_CONFIG: ${{ secrets.KUBE_CONFIG_DATA }}
 
 jobs:
@@ -121,13 +121,13 @@ jobs:
           
       - name: ⏳ Wait for deployment
         run: |
-          kubectl wait --for=condition=available --timeout=300s deployment/backend -n humor-game
-          kubectl wait --for=condition=available --timeout=300s deployment/frontend -n humor-game
+          kubectl wait --for=condition=available --timeout=300s deployment/backend -n application
+          kubectl wait --for=condition=available --timeout=300s deployment/frontend -n application
           
       - name: 🧪 Health check
         run: |
-          kubectl get pods -n humor-game
-          kubectl get services -n humor-game
+          kubectl get pods -n application
+          kubectl get services -n application
 
   notify:
     name: 📢 Notify Team

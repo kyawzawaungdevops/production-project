@@ -1,7 +1,7 @@
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: humor-game-safe
+  name: application-safe
   namespace: argocd
 spec:
   description: Safe GitOps monitoring for Humor Game (read-only initially)
@@ -12,7 +12,7 @@ spec:
   
   # Destination clusters and namespaces
   destinations:
-  - namespace: humor-game
+  - namespace: application
     server: https://kubernetes.default.svc
   
   # Cluster resource allow list - only allow specific resources

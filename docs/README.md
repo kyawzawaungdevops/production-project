@@ -122,8 +122,8 @@ make verify
 ### **🔧 Quick Diagnostic Commands**
 ```bash
 # Application health check
-kubectl get pods -n humor-game
-kubectl get svc -n humor-game
+kubectl get pods -n application
+kubectl get svc -n application
 curl -H "Host: gameapp.local" http://localhost:8080/api/health
 
 # Monitoring status

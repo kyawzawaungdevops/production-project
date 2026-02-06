@@ -236,8 +236,8 @@ make test-endpoints
 ### **🔍 Debugging Commands**
 ```bash
 # Application health
-kubectl get pods -n humor-game
-kubectl logs -l app=backend -n humor-game --tail=50
+kubectl get pods -n application
+kubectl logs -l app=backend -n application --tail=50
 
 # Monitoring access
 kubectl port-forward svc/grafana -n monitoring 3000:3000
@@ -328,7 +328,7 @@ Special thanks to the open-source community and the maintainers of:
 *Built with ❤️ by the DevOps community. Start your journey to production-ready Kubernetes deployments today!*
 
 **By the end, you'll have:**
-- ✅ **4 pods running** in humor-game namespace
+- ✅ **4 pods running** in application namespace
 - ✅ **Monitoring stack** with Prometheus and Grafana
 - ✅ **GitOps automation** with ArgoCD
 - ✅ **Production security** with network policies

@@ -14,7 +14,7 @@ BLUE='\033[0;34m'
 NC='\033[0m' # No Color
 
 # Configuration
-NAMESPACE="humor-game"
+NAMESPACE="application"
 MONITORING_NAMESPACE="monitoring"
 ARGOCD_NAMESPACE="argocd"
 INGRESS_NAMESPACE="ingress-nginx"
@@ -115,7 +115,7 @@ fi
 print_status "SUCCESS" "All required namespaces exist"
 echo ""
 
-# Check pods in humor-game namespace
+# Check pods in application namespace
 print_status "INFO" "Checking pods in $NAMESPACE namespace..."
 
 POD_COUNT=$(kubectl get pods -n "$NAMESPACE" --no-headers | wc -l)
@@ -172,7 +172,7 @@ echo ""
 print_status "INFO" "Checking services..."
 
 # Check if services exist
-SERVICES=("humor-game-frontend" "humor-game-backend" "humor-game-postgres" "humor-game-redis")
+SERVICES=("application-frontend" "application-backend" "application-postgres" "application-redis")
 MISSING_SERVICES=()
 
 for svc in "${SERVICES[@]}"; do
@@ -204,7 +204,7 @@ echo ""
 print_status "INFO" "Checking service reachability..."
 
 # Test backend service
-if kubectl port-forward -n "$NAMESPACE" service/humor-game-backend 3001:3001 >/dev/null 2>&1 &; then
+if kubectl port-forward -n "$NAMESPACE" service/application-backend 3001:3001 >/dev/null 2>&1 &; then
     BACKEND_PID=$!
     sleep 2
     
@@ -222,7 +222,7 @@ else
 fi
 
 # Test frontend service
-if kubectl port-forward -n "$NAMESPACE" service/humor-game-frontend 8080:80 >/dev/null 2>&1 &; then
+if kubectl port-forward -n "$NAMESPACE" service/application-frontend 8080:80 >/dev/null 2>&1 &; then
     FRONTEND_PID=$!
     sleep 2
     
@@ -279,7 +279,7 @@ echo ""
 echo "🚀 Next steps:"
 echo "   • Access your application: http://localhost:8080"
 echo "   • Check monitoring: kubectl port-forward -n monitoring service/grafana 3000:3000"
-echo "   • View logs: kubectl logs -n $NAMESPACE -l app=humor-game-backend"
+echo "   • View logs: kubectl logs -n $NAMESPACE -l app=application-backend"
 echo ""
 
 exit 0

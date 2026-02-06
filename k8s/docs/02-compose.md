@@ -182,10 +182,10 @@ API_BASE_URL=/api
 **Service Status:**
 ```bash
 NAME                       IMAGE                           STATUS                    PORTS
-humor-game-postgres        postgres:15-alpine              Up 13 minutes            5432/tcp
-humor-game-redis           redis:7-alpine                  Up 6 minutes             6379/tcp
-humor-game-backend         game-app-laptop-demo-backend    Up 13 minutes            0.0.0.0:3001->3001/tcp
-humor-game-frontend        game-app-laptop-demo-frontend   Up 6 minutes (healthy)   0.0.0.0:3000->80/tcp
+application-postgres        postgres:15-alpine              Up 13 minutes            5432/tcp
+application-redis           redis:7-alpine                  Up 6 minutes             6379/tcp
+application-backend         game-app-laptop-demo-backend    Up 13 minutes            0.0.0.0:3001->3001/tcp
+application-frontend        game-app-laptop-demo-frontend   Up 6 minutes (healthy)   0.0.0.0:3000->80/tcp
 ```
 
 **Backend Health Check:**

@@ -24,13 +24,13 @@ apiVersion: networking.k8s.io/v1
 kind: Ingress
 metadata:
   name: tunnel-ingress
-  namespace: humor-game
+  namespace: application
   annotations:
     nginx.ingress.kubernetes.io/cors-allow-origin: "*"
     nginx.ingress.kubernetes.io/cors-allow-credentials: "true"
     # No SSL redirect for tunnel to prevent loops
 spec:
-  ingressClassName: humor-game-nginx
+  ingressClassName: application-nginx
   rules:
     - host: app.yourdomain.com  # Tunnel subdomain
       http:
@@ -223,17 +223,17 @@ nslookup yourdomain.com 8.8.8.8
 ### **Kubernetes Resource Check:**
 ```bash
 # Check all resources in namespace
-kubectl get all -n humor-game
-kubectl get ingress -n humor-game
-kubectl get certificates -n humor-game
+kubectl get all -n application
+kubectl get ingress -n application
+kubectl get certificates -n application
 
 # Check pod logs
 kubectl logs deployment/ingress-nginx-controller -n ingress-nginx
 kubectl logs deployment/cert-manager -n cert-manager
 
 # Check service endpoints
-kubectl get endpoints -n humor-game
-kubectl describe service frontend -n humor-game
+kubectl get endpoints -n application
+kubectl describe service frontend -n application
 ```
 
 ### **Network Connectivity Check:**
@@ -276,7 +276,7 @@ cloudflared tunnel route dns YOUR_TUNNEL_ID app.yourdomain.com
 **Solution:**
 ```bash
 # Check if k3d cluster is running
-kubectl get pods -n humor-game
+kubectl get pods -n application
 
 # Check if ingress is accessible
 curl -I http://localhost:8080/

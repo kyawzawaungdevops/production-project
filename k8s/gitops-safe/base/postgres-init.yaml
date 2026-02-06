@@ -2,7 +2,7 @@ apiVersion: v1
 kind: ConfigMap
 metadata:
   name: postgres-init
-  namespace: humor-game
+  namespace: application
 data:
   01-init.sql: |
     -- Humor Memory Game Database Schema

@@ -13,7 +13,7 @@
 **Solution Applied:**
 ```bash
 # 1. Delete problematic ArgoCD setup
-kubectl delete application humor-game-dev -n argocd --force
+kubectl delete application application-dev -n argocd --force
 
 # 2. Manually recreate services to restore app
 kubectl apply -f k8s/redis.yaml
@@ -22,7 +22,7 @@ kubectl apply -f k8s/backend.yaml
 kubectl apply -f k8s/frontend.yaml
 
 # 3. Verify app is working
-kubectl get pods -n humor-game
+kubectl get pods -n application
 curl http://gameapp.local:8080/health
 ```
 
@@ -40,7 +40,7 @@ curl http://gameapp.local:8080/health
 # Start with only ConfigMaps and PVCs
 
 # 2. Force ArgoCD refresh
-kubectl patch application humor-game-monitor -n argocd \
+kubectl patch application application-monitor -n argocd \
   --type='merge' \
   -p='{"metadata": {"annotations": {"argocd.argoproj.io/refresh": "true"}}}'
 
@@ -58,14 +58,14 @@ kubectl patch application humor-game-monitor -n argocd \
 **Solution Applied:**
 ```bash
 # 1. Find the stale annotation
-kubectl get configmap humor-game-config -n humor-game -o yaml | grep tracking-id
+kubectl get configmap application-config -n application -o yaml | grep tracking-id
 
 # 2. Remove the stale annotation
-kubectl annotate configmap humor-game-config -n humor-game \
+kubectl annotate configmap application-config -n application \
   argocd.argoproj.io/tracking-id-
 
 # 3. Remove old ArgoCD labels
-kubectl label configmap humor-game-config -n humor-game \
+kubectl label configmap application-config -n application \
   app.kubernetes.io/managed-by- \
   app.kubernetes.io/part-of-
 ```
@@ -80,10 +80,10 @@ kubectl label configmap humor-game-config -n humor-game \
 **Solution Applied:**
 ```bash
 # 1. Verify HPAs are actually working
-kubectl get hpa -n humor-game
+kubectl get hpa -n application
 
 # 2. Check if they're scaling correctly
-kubectl describe hpa backend-hpa -n humor-game
+kubectl describe hpa backend-hpa -n application
 
 # 3. Remove HPAs from GitOps (they work fine without it)
 # Delete hpa.yaml from gitops-safe/base/
@@ -100,24 +100,24 @@ kubectl describe hpa backend-hpa -n humor-game
 kubectl get applications -n argocd
 
 # Detailed status
-kubectl describe application humor-game-monitor -n argocd
+kubectl describe application application-monitor -n argocd
 
 # Resource count
-kubectl describe application humor-game-monitor -n argocd | grep "Kind:" | wc -l
+kubectl describe application application-monitor -n argocd | grep "Kind:" | wc -l
 ```
 
 ### 2. **Check Resource Health**
 ```bash
 # All resources in namespace
-kubectl get all -n humor-game
+kubectl get all -n application
 
 # Specific resource types
-kubectl get deployments -n humor-game
-kubectl get services -n humor-game
-kubectl get hpa -n humor-game
+kubectl get deployments -n application
+kubectl get services -n application
+kubectl get hpa -n application
 
 # Resource details
-kubectl describe deployment backend -n humor-game
+kubectl describe deployment backend -n application
 ```
 
 ### 3. **Check ArgoCD Logs**
@@ -141,7 +141,7 @@ kubectl diff -f gitops-safe/base/backend.yaml
 kubectl diff -f gitops-safe/base/
 
 # Check what ArgoCD sees
-kubectl describe application humor-game-monitor -n argocd | grep -A 50 "Resources:"
+kubectl describe application application-monitor -n argocd | grep -A 50 "Resources:"
 ```
 
 ## 🚨 Common Error Messages and Solutions
@@ -215,7 +215,7 @@ kubectl describe application app-name -n argocd | grep "Source:"
 ```bash
 # Check immediate status
 kubectl get applications -n argocd
-kubectl get pods -n humor-game
+kubectl get pods -n application
 
 # Check app functionality
 curl http://gameapp.local:8080/health
@@ -266,7 +266,7 @@ curl http://gameapp.local:8080/health
 **Immediate Action:**
 ```bash
 # 1. Stop ArgoCD from making changes
-kubectl delete application humor-game-monitor -n argocd
+kubectl delete application application-monitor -n argocd
 
 # 2. Restore from working backup
 kubectl apply -f k8s/redis.yaml
@@ -275,7 +275,7 @@ kubectl apply -f k8s/backend.yaml
 kubectl apply -f k8s/frontend.yaml
 
 # 3. Verify app is working
-kubectl get pods -n humor-game
+kubectl get pods -n application
 curl http://gameapp.local:8080/health
 ```
 
@@ -320,7 +320,7 @@ kubectl rollout restart deployment/argocd-application-controller -n argocd
 ```bash
 # Backup current state before changes
 mkdir -p ~/gitops-backup
-kubectl get all,configmap,secret,ingress -n humor-game -o yaml > ~/gitops-backup/current-state.yaml
+kubectl get all,configmap,secret,ingress -n application -o yaml > ~/gitops-backup/current-state.yaml
 
 # Backup ArgoCD configuration
 kubectl get application,appproject -n argocd -o yaml > ~/gitops-backup/argocd-config.yaml
@@ -329,10 +329,10 @@ kubectl get application,appproject -n argocd -o yaml > ~/gitops-backup/argocd-co
 ### 4. **Monitor Changes**
 ```bash
 # Watch ArgoCD application status
-watch kubectl get application humor-game-monitor -n argocd
+watch kubectl get application application-monitor -n argocd
 
 # Monitor resource changes
-kubectl get events -n humor-game --sort-by='.lastTimestamp'
+kubectl get events -n application --sort-by='.lastTimestamp'
 ```
 
 ## 📚 Additional Resources

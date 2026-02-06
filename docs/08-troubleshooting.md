@@ -7,9 +7,9 @@
 | Issue | Quick Fix | More Info |
 |-------|-----------|-----------|
 | **Cluster won't start** | `k3d cluster delete homelab && k3d cluster create homelab` | [Cluster Issues](#cluster-issues) |
-| **Pods stuck in Pending** | `kubectl describe pod <pod-name> -n humor-game` | [Pod Issues](#pod-issues) |
-| **Services not accessible** | `kubectl port-forward -n humor-game service/humor-game-frontend 8080:80` | [Service Issues](#service-issues) |
-| **Database connection failed** | Check PostgreSQL pod logs: `kubectl logs -n humor-game humor-game-postgres` | [Database Issues](#database-issues) |
+| **Pods stuck in Pending** | `kubectl describe pod <pod-name> -n application` | [Pod Issues](#pod-issues) |
+| **Services not accessible** | `kubectl port-forward -n application service/application-frontend 8080:80` | [Service Issues](#service-issues) |
+| **Database connection failed** | Check PostgreSQL pod logs: `kubectl logs -n application application-postgres` | [Database Issues](#database-issues) |
 | **Ingress not working** | Verify ingress controller: `kubectl get pods -n ingress-nginx` | [Ingress Issues](#ingress-issues) |
 
 ## 🔍 Diagnostic Commands
@@ -33,40 +33,40 @@ kubectl top pods --all-namespaces
 ### **Namespace Status**
 ```bash
 # Check specific namespace
-kubectl get all -n humor-game
+kubectl get all -n application
 
 # Check namespace events
-kubectl get events -n humor-game --sort-by='.lastTimestamp'
+kubectl get events -n application --sort-by='.lastTimestamp'
 
 # Check namespace resource quotas
-kubectl get resourcequota -n humor-game
+kubectl get resourcequota -n application
 ```
 
 ### **Pod Diagnostics**
 ```bash
 # Get pod details
-kubectl describe pod <pod-name> -n humor-game
+kubectl describe pod <pod-name> -n application
 
 # Check pod logs
-kubectl logs <pod-name> -n humor-game
+kubectl logs <pod-name> -n application
 
 # Check pod resources
-kubectl top pod <pod-name> -n humor-game
+kubectl top pod <pod-name> -n application
 
 # Execute into pod
-kubectl exec -it <pod-name> -n humor-game -- /bin/bash
+kubectl exec -it <pod-name> -n application -- /bin/bash
 ```
 
 ### **Service Diagnostics**
 ```bash
 # Check service endpoints
-kubectl get endpoints -n humor-game
+kubectl get endpoints -n application
 
 # Test service connectivity
-kubectl port-forward -n humor-game service/humor-game-backend 3001:3001
+kubectl port-forward -n application service/application-backend 3001:3001
 
 # Check service configuration
-kubectl describe service <service-name> -n humor-game
+kubectl describe service <service-name> -n application
 ```
 
 ---
@@ -79,7 +79,7 @@ kubectl describe service <service-name> -n humor-game
 |---------|-------|-------------------|-----|
 | **Docker Compose fails to start** | Port conflicts or Docker not running | `docker ps` | Start Docker Desktop, check port 3001/8080 availability |
 | **Database connection refused** | PostgreSQL container not ready | `docker logs postgres` | Wait for container to fully start, check depends_on in docker-compose.yml |
-| **Frontend shows "Cannot connect to API"** | Backend service not responding | `curl http://localhost:3001/health` | Check backend logs: `docker logs humor-game-backend` |
+| **Frontend shows "Cannot connect to API"** | Backend service not responding | `curl http://localhost:3001/health` | Check backend logs: `docker logs application-backend` |
 | **Redis connection failed** | Redis container not running | `docker ps \| grep redis` | Restart Redis: `docker restart redis` |
 
 ### **Milestone 2: Kubernetes Basics Issues**
@@ -88,8 +88,8 @@ kubectl describe service <service-name> -n humor-game
 |---------|-------|-------------------|-----|
 | **k3d cluster creation fails** | Insufficient resources or Docker issues | `docker system df` | Free up Docker resources, ensure 4GB+ RAM available |
 | **kubectl connection refused** | Cluster not running or context wrong | `k3d cluster list` | Start cluster: `k3d cluster start homelab` |
-| **Pods stuck in Pending** | Insufficient cluster resources | `kubectl describe pod <pod-name> -n humor-game` | Increase cluster resources: `k3d cluster create homelab --servers 1 --agents 2 --k3s-arg "--kube-apiserver-arg=--max-pods=100"` |
-| **Image pull errors** | Image not built or wrong tag | `kubectl describe pod <pod-name> -n humor-game` | Build and import images: `docker build -t humor-game-backend:latest backend/` |
+| **Pods stuck in Pending** | Insufficient cluster resources | `kubectl describe pod <pod-name> -n application` | Increase cluster resources: `k3d cluster create homelab --servers 1 --agents 2 --k3s-arg "--kube-apiserver-arg=--max-pods=100"` |
+| **Image pull errors** | Image not built or wrong tag | `kubectl describe pod <pod-name> -n application` | Build and import images: `docker build -t application-backend:latest backend/` |
 
 ### **Milestone 3: Ingress Issues**
 
@@ -97,14 +97,14 @@ kubectl describe service <service-name> -n humor-game
 |---------|-------|-------------------|-----|
 | **Ingress controller not found** | Ingress controller not installed | `kubectl get pods -n ingress-nginx` | Install ingress: `kubectl apply -f https://raw.githubusercontent.com/kubernetes/ingress-nginx/controller-v1.8.2/deploy/static/provider/cloud/deploy.yaml` |
 | **Domain not resolving** | /etc/hosts not configured | `cat /etc/hosts \| grep gameapp` | Add entry: `127.0.0.1 gameapp.local` |
-| **Ingress shows 404** | Service selector mismatch | `kubectl get ingress -n humor-game -o yaml` | Check service names and ports in ingress.yaml |
+| **Ingress shows 404** | Service selector mismatch | `kubectl get ingress -n application -o yaml` | Check service names and ports in ingress.yaml |
 | **TLS certificate errors** | cert-manager not installed | `kubectl get pods -n cert-manager` | Install cert-manager for Let's Encrypt certificates |
 
 ### **Milestone 4: Monitoring Issues**
 
 | Symptom | Cause | Command to Confirm | Fix |
 |---------|-------|-------------------|-----|
-| **Prometheus not collecting metrics** | ServiceMonitor not configured | `kubectl get servicemonitor -n monitoring` | Create ServiceMonitor for humor-game-backend |
+| **Prometheus not collecting metrics** | ServiceMonitor not configured | `kubectl get servicemonitor -n monitoring` | Create ServiceMonitor for application-backend |
 | **Grafana dashboard empty** | Prometheus data source not configured | `kubectl get configmap grafana-datasources -n monitoring -o yaml` | Check Prometheus URL in Grafana config |
 | **Metrics endpoint not accessible** | Backend metrics not enabled | `curl http://localhost:3001/metrics` | Ensure metrics middleware is enabled in backend |
 | **Alerts not firing** | Prometheus rules not loaded | `kubectl get prometheusrule -n monitoring` | Check PrometheusRule configuration |
@@ -122,10 +122,10 @@ kubectl describe service <service-name> -n humor-game
 
 | Symptom | Cause | Command to Confirm | Fix |
 |---------|-------|-------------------|-----|
-| **Pods being evicted** | Resource limits too low | `kubectl describe pod <pod-name> -n humor-game` | Increase resource limits in deployment.yaml |
-| **Network policies blocking traffic** | Overly restrictive policies | `kubectl get networkpolicy -n humor-game` | Review and adjust network policy rules |
-| **Security context violations** | Container trying to run as root | `kubectl describe pod <pod-name> -n humor-game` | Check security context in deployment.yaml |
-| **HPA not scaling** | Metrics not available or thresholds too high | `kubectl get hpa -n humor-game` | Check HPA configuration and metrics availability |
+| **Pods being evicted** | Resource limits too low | `kubectl describe pod <pod-name> -n application` | Increase resource limits in deployment.yaml |
+| **Network policies blocking traffic** | Overly restrictive policies | `kubectl get networkpolicy -n application` | Review and adjust network policy rules |
+| **Security context violations** | Container trying to run as root | `kubectl describe pod <pod-name> -n application` | Check security context in deployment.yaml |
+| **HPA not scaling** | Metrics not available or thresholds too high | `kubectl get hpa -n application` | Check HPA configuration and metrics availability |
 
 ---
 
@@ -163,7 +163,7 @@ kubectl describe node | grep -A 10 "Conditions:"
 kubectl get events --all-namespaces | grep -i "oom"
 
 # Check for throttling
-kubectl describe pod <pod-name> -n humor-game | grep -A 5 "Last State"
+kubectl describe pod <pod-name> -n application | grep -A 5 "Last State"
 ```
 
 ### **Network Issues**
@@ -173,10 +173,10 @@ kubectl describe pod <pod-name> -n humor-game | grep -A 5 "Last State"
 kubectl get networkpolicy --all-namespaces
 
 # Test pod-to-pod communication
-kubectl exec -it <pod1> -n humor-game -- ping <pod2-ip>
+kubectl exec -it <pod1> -n application -- ping <pod2-ip>
 
 # Check DNS resolution
-kubectl exec -it <pod-name> -n humor-game -- nslookup kubernetes.default
+kubectl exec -it <pod-name> -n application -- nslookup kubernetes.default
 
 # Check service endpoints
 kubectl get endpoints --all-namespaces
@@ -224,7 +224,7 @@ kubectl get events --all-namespaces | grep -i "volume\|storage"
 kubectl cluster-info dump > cluster-dump.yaml
 
 # Get all resources in a namespace
-kubectl get all -n humor-game -o yaml > humor-game-resources.yaml
+kubectl get all -n application -o yaml > application-resources.yaml
 
 # Get events for debugging
 kubectl get events --all-namespaces --sort-by='.lastTimestamp' > events.yaml

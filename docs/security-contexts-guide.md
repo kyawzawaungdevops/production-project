@@ -102,14 +102,14 @@ Permission denied
 
 ```bash
 # Check if containers are running as non-root
-kubectl exec -it deployment/frontend -n humor-game -- whoami
+kubectl exec -it deployment/frontend -n application -- whoami
 # Should return: nginx (not root)
 
-kubectl exec -it deployment/backend -n humor-game -- whoami  
+kubectl exec -it deployment/backend -n application -- whoami  
 # Should return: backend (not root)
 
 # Check security context configuration
-kubectl describe deployment frontend -n humor-game | grep -A 10 "Security Context"
+kubectl describe deployment frontend -n application | grep -A 10 "Security Context"
 ```
 
 ## 🎯 Security Contexts vs Network Policies

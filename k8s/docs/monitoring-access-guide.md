@@ -80,8 +80,8 @@ kubectl get svc -n ingress-nginx
 kubectl get nodes -o wide
 
 # Or use the same detection logic as the script:
-INGRESS_IP=$(kubectl get svc -n ingress-nginx humor-game-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || \
-             kubectl get svc -n ingress-nginx humor-game-nginx-controller -o jsonpath='{.spec.clusterIP}' 2>/dev/null || \
+INGRESS_IP=$(kubectl get svc -n ingress-nginx application-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || \
+             kubectl get svc -n ingress-nginx application-nginx-controller -o jsonpath='{.spec.clusterIP}' 2>/dev/null || \
              kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' 2>/dev/null)
 echo "Detected IP: $INGRESS_IP"
 ```

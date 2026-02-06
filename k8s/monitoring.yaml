@@ -18,16 +18,16 @@ data:
       - /etc/prometheus/rules/*.yml
     
     scrape_configs:
-      # Static targets for humor-game services
-      - job_name: 'humor-game-backend'
+      # Static targets for application services
+      - job_name: 'application-backend'
         static_configs:
-          - targets: ['backend.humor-game.svc.cluster.local:3001']
+          - targets: ['backend.application.svc.cluster.local:3001']
         metrics_path: '/metrics'
         scrape_interval: 15s
       
-      - job_name: 'humor-game-frontend'
+      - job_name: 'application-frontend'
         static_configs:
-          - targets: ['frontend.humor-game.svc.cluster.local:80']
+          - targets: ['frontend.application.svc.cluster.local:80']
         metrics_path: '/metrics'
         scrape_interval: 15s
       
@@ -104,9 +104,9 @@ metadata:
   name: prometheus-rules
   namespace: monitoring
 data:
-  humor-game-alerts.yml: |
+  application-alerts.yml: |
     groups:
-      - name: humor-game-production
+      - name: application-production
         rules:
           # High Error Rate Alert
           - alert: HighErrorRate
@@ -114,7 +114,7 @@ data:
             for: 2m
             labels:
               severity: warning
-              service: humor-game
+              service: application
             annotations:
               summary: "High error rate detected"
               description: "Error rate is {{ $value }} errors/sec for the last 5 minutes"
@@ -125,7 +125,7 @@ data:
             for: 2m
             labels:
               severity: warning
-              service: humor-game
+              service: application
             annotations:
               summary: "High response time detected"
               description: "95th percentile response time is {{ $value }}s"
@@ -136,7 +136,7 @@ data:
             for: 1m
             labels:
               severity: warning
-              service: humor-game
+              service: application
             annotations:
               summary: "High database connections"
               description: "Database has {{ $value }} active connections"
@@ -147,7 +147,7 @@ data:
             for: 2m
             labels:
               severity: warning
-              service: humor-game
+              service: application
             annotations:
               summary: "Low Redis cache hit rate"
               description: "Cache hit rate is {{ $value | humanizePercentage }}"
@@ -158,7 +158,7 @@ data:
             for: 1m
             labels:
               severity: critical
-              service: humor-game
+              service: application
             annotations:
               summary: "Application is unhealthy"
               description: "Service {{ $labels.service }} component {{ $labels.component }} is down"
@@ -169,7 +169,7 @@ data:
             for: 2m
             labels:
               severity: warning
-              service: humor-game
+              service: application
             annotations:
               summary: "High memory usage"
               description: "Component {{ $labels.component }} using {{ $value }}GB of memory"
@@ -180,7 +180,7 @@ data:
             for: 5m
             labels:
               severity: warning
-              service: humor-game
+              service: application
             annotations:
               summary: "Low game accuracy detected"
               description: "Game accuracy for {{ $labels.difficulty }} is {{ $value | humanizePercentage }}"
@@ -368,12 +368,12 @@ data:
         editable: true
         options:
           path: /etc/grafana/provisioning/dashboards
-  humor-game-dashboard.json: |
+  application-dashboard.json: |
     {
       "dashboard": {
         "id": null,
         "title": "Humor Memory Game - Production Dashboard",
-        "tags": ["game", "memory", "humor-game", "production"],
+        "tags": ["game", "memory", "application", "production"],
         "timezone": "browser",
         "panels": [
           {
@@ -637,7 +637,7 @@ data:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: humor-game-backend
+  name: application-backend
   namespace: monitoring
 spec:
   selector:
@@ -651,7 +651,7 @@ spec:
 apiVersion: monitoring.coreos.com/v1
 kind: ServiceMonitor
 metadata:
-  name: humor-game-frontend
+  name: application-frontend
   namespace: monitoring
 spec:
   selector:

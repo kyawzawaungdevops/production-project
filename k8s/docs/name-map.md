@@ -4,18 +4,18 @@
 
 | Type | Exact Value | Source (file:line) |
 |------|-------------|-------------------|
-| **Namespace** | humor-game | k8s/namespace.yaml:4 |
+| **Namespace** | application | k8s/namespace.yaml:4 |
 | **Namespace** | monitoring | k8s/monitoring.yaml:3, k8s/simple-monitoring.yaml:4 |
 | **Namespace** | argocd | k8s/ingress.yaml:107, k8s/tunnel-ingress.yaml:116 |
 | **Namespace** | game-app | k8s/secrets.template.yaml:8 |
 | **Namespace** | ingress-nginx | k8s/network-policies.yaml:20 |
-| **ConfigMap** | humor-game-config | k8s/configmap.yaml:3 |
+| **ConfigMap** | application-config | k8s/configmap.yaml:3 |
 | **ConfigMap** | frontend-config | k8s/frontend-config.yaml:3 |
 | **ConfigMap** | prometheus-config | k8s/monitoring.yaml:8, k8s/simple-monitoring.yaml:10 |
 | **ConfigMap** | prometheus-rules | k8s/monitoring.yaml:103 |
 | **ConfigMap** | grafana-datasources | k8s/monitoring.yaml:309, k8s/simple-monitoring.yaml:139 |
 | **ConfigMap** | grafana-dashboards | k8s/monitoring.yaml:312, k8s/simple-monitoring.yaml:149 |
-| **Secret** | humor-game-secrets | k8s/secrets.yaml:3, k8s/redis.yaml:24 |
+| **Secret** | application-secrets | k8s/secrets.yaml:3, k8s/redis.yaml:24 |
 | **Secret** | game-app-secrets | k8s/secrets.template.yaml:7 |
 | **Service** | postgres | k8s/postgres.yaml:3 |
 | **Service** | redis | k8s/redis.yaml:3 |
@@ -29,11 +29,11 @@
 | **Deployment** | frontend | k8s/frontend.yaml:11 |
 | **Deployment** | prometheus | k8s/monitoring.yaml:242, k8s/simple-monitoring.yaml:58 |
 | **Deployment** | grafana | k8s/monitoring.yaml:316, k8s/simple-monitoring.yaml:157 |
-| **Ingress** | humor-game-ingress | k8s/ingress.yaml:3 |
+| **Ingress** | application-ingress | k8s/ingress.yaml:3 |
 | **Ingress** | tunnel-ingress | k8s/tunnel-ingress.yaml:3 |
 | **Ingress** | monitoring-tunnel-ingress | k8s/monitoring-tunnel-ingress.yaml:3 |
 | **Ingress** | unified-ingress | k8s/unified-ingress.yaml:7 |
-| **IngressClass** | humor-game-nginx | k8s/ingress.yaml:16, k8s/tunnel-ingress.yaml:16 |
+| **IngressClass** | application-nginx | k8s/ingress.yaml:16, k8s/tunnel-ingress.yaml:16 |
 | **ClusterIssuer** | letsencrypt-prod | k8s/cluster-issuer.yaml:3,9 |
 | **ServiceAccount** | prometheus | k8s/monitoring.yaml:202, k8s/prometheus-rbac.yaml:24,28,31,37 |
 | **ClusterRole** | prometheus | k8s/prometheus-rbac.yaml:3 |
@@ -59,10 +59,10 @@
 | **Docker Service** | redis | docker-compose.yml:32 |
 | **Docker Service** | backend | docker-compose.yml:58 |
 | **Docker Service** | frontend | docker-compose.yml:100 |
-| **Docker Container** | humor-game-postgres | docker-compose.yml:7 |
-| **Docker Container** | humor-game-redis | docker-compose.yml:33 |
-| **Docker Container** | humor-game-backend | docker-compose.yml:59 |
-| **Docker Container** | humor-game-frontend | docker-compose.yml:101 |
+| **Docker Container** | application-postgres | docker-compose.yml:7 |
+| **Docker Container** | application-redis | docker-compose.yml:33 |
+| **Docker Container** | application-backend | docker-compose.yml:59 |
+| **Docker Container** | application-frontend | docker-compose.yml:101 |
 | **Docker Network** | backend-network | docker-compose.yml:25,58,100 |
 | **Docker Network** | frontend-network | docker-compose.yml:58,100 |
 | **Docker Volume** | postgres_data | docker-compose.yml:130 |
@@ -119,21 +119,21 @@
 | **Component Selector** | component=redis | k8s/redis.yaml:40 |
 | **Component Selector** | component=prometheus | k8s/monitoring.yaml:193 |
 | **Component Selector** | component=grafana | k8s/monitoring.yaml:270 |
-| **Job Name** | humor-game-backend | k8s/monitoring.yaml:21, k8s/simple-monitoring.yaml:87 |
-| **Job Name** | humor-game-frontend | k8s/monitoring.yaml:27, k8s/simple-monitoring.yaml:93 |
+| **Job Name** | application-backend | k8s/monitoring.yaml:21, k8s/simple-monitoring.yaml:87 |
+| **Job Name** | application-frontend | k8s/monitoring.yaml:27, k8s/simple-monitoring.yaml:93 |
 | **Job Name** | kubernetes-pods | k8s/monitoring.yaml:34, k8s/simple-monitoring.yaml:66 |
 | **Job Name** | kubelet | k8s/monitoring.yaml:60 |
 | **Job Name** | kubernetes-service-endpoints | k8s/monitoring.yaml:78 |
-| **Job Name** | humor-game-production | k8s/monitoring.yaml:108 |
+| **Job Name** | application-production | k8s/monitoring.yaml:108 |
 | **Job Name** | default | k8s/monitoring.yaml:362 |
-| **Ingress Controller** | humor-game-nginx | scripts/access-monitoring.sh:69,70 |
-| **Cluster Name** | humor-game | scripts/access-monitoring.sh:18 |
+| **Ingress Controller** | application-nginx | scripts/access-monitoring.sh:69,70 |
+| **Cluster Name** | application | scripts/access-monitoring.sh:18 |
 
 ## Verification Report
 
 ### Namespace Values
 **FOUND IN:**
-- `k8s/namespace.yaml:4` - `name: humor-game`
+- `k8s/namespace.yaml:4` - `name: application`
 - `k8s/monitoring.yaml:3` - `name: monitoring`
 - `k8s/simple-monitoring.yaml:4` - `name: monitoring`
 - `k8s/ingress.yaml:107` - `namespace: argocd`
@@ -144,7 +144,7 @@
 **EVIDENCE:**
 ```yaml
 # k8s/namespace.yaml:4
-  name: humor-game
+  name: application
 
 # k8s/monitoring.yaml:3
   name: monitoring
@@ -261,7 +261,7 @@ console.log('🔧 Current window.API_BASE_URL:', window.API_BASE_URL);
 
 ### Quick Cross-Checks
 **grep -R "namespace:" k8s/**
-- Found: humor-game, monitoring, argocd, game-app, ingress-nginx
+- Found: application, monitoring, argocd, game-app, ingress-nginx
 
 **grep -R "metadata:\n  name:" k8s/**
 - Found: All service, deployment, and resource names

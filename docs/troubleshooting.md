@@ -15,7 +15,7 @@ Grafana panels show "No data" instead of metrics.
 **A. Prometheus Not Scraping Targets**
 ```bash
 # Check if Prometheus can see your pods
-kubectl get pods -n humor-game -o yaml | grep -A 5 -B 5 prometheus
+kubectl get pods -n application -o yaml | grep -A 5 -B 5 prometheus
 
 # Expected: Should see prometheus.io/scrape annotations
 ```
@@ -23,7 +23,7 @@ kubectl get pods -n humor-game -o yaml | grep -A 5 -B 5 prometheus
 **B. Missing Prometheus Annotations**
 ```bash
 # Check if your pods have the right labels
-kubectl get pods -n humor-game --show-labels
+kubectl get pods -n application --show-labels
 
 # Should see: app=backend, app=frontend
 ```
@@ -59,7 +59,7 @@ lsof -ti:3001 | xargs kill -9
 # Start fresh port-forwards
 kubectl port-forward -n monitoring svc/grafana 3000:3000 &
 kubectl port-forward -n monitoring svc/prometheus 9090:9090 &
-kubectl port-forward -n humor-game svc/backend 3001:3001 &
+kubectl port-forward -n application svc/backend 3001:3001 &
 ```
 
 ### **3. Backend Connection Issues**
@@ -73,7 +73,7 @@ Scripts get HTTP 000 errors when trying to connect to backend.
 lsof -i :3001
 
 # If not running, start it
-kubectl port-forward -n humor-game svc/backend 3001:3001 &
+kubectl port-forward -n application svc/backend 3001:3001 &
 
 # Test connection
 curl -s http://localhost:3001/health
@@ -174,7 +174,7 @@ NEW_AUTH=$(htpasswd -bn admin admin123 | base64 -w 0)
 kubectl patch secret monitoring-auth -n monitoring --type='json' -p="[{\"op\": \"replace\", \"path\": \"/data/auth\", \"value\": \"$NEW_AUTH\"}]"
 
 # 3. Restart ingress controller to pick up changes
-kubectl rollout restart deployment -n ingress-nginx humor-game-ingress-ingress-nginx-controller
+kubectl rollout restart deployment -n ingress-nginx application-ingress-ingress-nginx-controller
 
 # 4. Wait for restart and test
 kubectl wait --for=condition=ready pod -l app.kubernetes.io/name=ingress-nginx -n ingress-nginx --timeout=60s
@@ -288,7 +288,7 @@ docker-compose exec redis redis-cli ping
 k3d cluster list
 
 # If cluster missing, recreate
-k3d cluster delete humor-game-cluster
+k3d cluster delete application-cluster
 k3d cluster create --config k3d-config.yaml
 
 # Check nodes
@@ -298,29 +298,29 @@ kubectl get nodes -o wide
 #### **Problem: Pods Stuck in Pending**
 ```bash
 # Check what's wrong
-kubectl describe pod <pod-name> -n humor-game
+kubectl describe pod <pod-name> -n application
 
 # Common cause: Insufficient resources
 kubectl top nodes  # Check resource usage
 
 # Check events
-kubectl get events -n humor-game --sort-by='.lastTimestamp'
+kubectl get events -n application --sort-by='.lastTimestamp'
 
 # Common fixes
-kubectl delete pod <pod-name> -n humor-game  # Force restart
+kubectl delete pod <pod-name> -n application  # Force restart
 kubectl apply -f k8s/namespace.yaml          # Recreate namespace
 ```
 
 #### **Problem: Backend Can't Connect to Database**
 ```bash
 # Check backend logs
-kubectl logs -l app=backend -n humor-game
+kubectl logs -l app=backend -n application
 
 # Verify database service exists
-kubectl get svc postgres -n humor-game
+kubectl get svc postgres -n application
 
 # Test database connectivity
-kubectl exec -it deployment/postgres -n humor-game -- psql -U gameuser -d humor_memory_game -c "SELECT 1;"
+kubectl exec -it deployment/postgres -n application -- psql -U gameuser -d humor_memory_game -c "SELECT 1;"
 ```
 
 #### **Problem: Frontend Not Loading Correctly**
@@ -343,7 +343,7 @@ curl -H "Host: gameapp.local" -I http://localhost:8080/scripts/game.js
 # Fix: Update backend/utils/redis.js to handle tcp:// prefix in REDIS_PORT
 
 # Verify fix:
-kubectl logs -l app=backend -n humor-game | grep "Redis: Connected"
+kubectl logs -l app=backend -n application | grep "Redis: Connected"
 # Should show: ✅ Redis: Connected and ready!
 ```
 
@@ -366,8 +366,8 @@ kubectl logs -l app=backend -n humor-game | grep "Redis: Connected"
 
 # Solution: Use local images with imagePullPolicy: Never
 # Fix: Build images locally first, then deploy
-docker build -t humor-game-frontend:latest ./frontend
-docker build -t humor-game-backend:latest ./backend
+docker build -t application-frontend:latest ./frontend
+docker build -t application-backend:latest ./backend
 
 # Check image availability
 docker images | grep -E "(backend|frontend)"
@@ -381,13 +381,13 @@ docker pull redis:7-alpine
 #### **Problem: Service Discovery Issues**
 ```bash
 # Check services
-kubectl get svc -n humor-game
+kubectl get svc -n application
 
 # Check endpoints
-kubectl get endpoints -n humor-game
+kubectl get endpoints -n application
 
 # Test internal connectivity
-kubectl run test-pod --image=curlimages/curl -i --rm --restart=Never -- curl backend.humor-game.svc.cluster.local:3001/health
+kubectl run test-pod --image=curlimages/curl -i --rm --restart=Never -- curl backend.application.svc.cluster.local:3001/health
 ```
 
 ### **🌐 Milestone 3: Ingress Issues**
@@ -407,8 +407,8 @@ kubectl wait --namespace ingress-nginx --for=condition=ready pod --selector=app.
 #### **Problem: Application Not Accessible via Domain**
 ```bash
 # Check ingress configuration
-kubectl get ingress -n humor-game
-kubectl describe ingress humor-game-ingress -n humor-game
+kubectl get ingress -n application
+kubectl describe ingress application-ingress -n application
 
 # Check hosts file
 grep gameapp.local /etc/hosts
@@ -436,13 +436,13 @@ curl -H "Host: gameapp.local" -s http://localhost:8080/api/health
 #### **Problem: SSL/TLS Certificate Issues**
 ```bash
 # Check certificate status
-kubectl get certificates -n humor-game
+kubectl get certificates -n application
 
 # Check cert-manager logs
 kubectl logs -n cert-manager deployment/cert-manager
 
 # Force certificate renewal
-kubectl delete certificate <cert-name> -n humor-game
+kubectl delete certificate <cert-name> -n application
 kubectl apply -f k8s/ingress.yaml
 ```
 
@@ -462,10 +462,10 @@ kubectl logs -f deployment/grafana -n monitoring
 #### **Problem: Prometheus Can't Scrape Metrics**
 ```bash
 # Verify targets are being discovered
-kubectl get endpoints -n humor-game
+kubectl get endpoints -n application
 
 # Check if pods have prometheus annotations
-kubectl get pods -n humor-game -o yaml | grep -A 5 -B 5 prometheus
+kubectl get pods -n application -o yaml | grep -A 5 -B 5 prometheus
 
 # Expected: Should see prometheus.io/scrape: "true"
 
@@ -473,7 +473,7 @@ kubectl get pods -n humor-game -o yaml | grep -A 5 -B 5 prometheus
 kubectl get servicemonitor -n monitoring
 
 # Test metrics endpoints
-kubectl port-forward -n humor-game svc/backend 3001:3001 &
+kubectl port-forward -n application svc/backend 3001:3001 &
 curl http://localhost:3001/metrics
 ```
 
@@ -487,7 +487,7 @@ curl http://localhost:3001/metrics
 kubectl get servicemonitor -n monitoring
 
 # Verify pods have metric endpoints
-kubectl get endpoints -n humor-game
+kubectl get endpoints -n application
 ```
 
 #### **Problem: Grafana Shows "No Data"**
@@ -504,7 +504,7 @@ kubectl get endpoints -n humor-game
 #### **Problem: Dashboards Are Empty**
 ```bash
 # Verify correct namespace in queries
-# Query should include: {namespace="humor-game"}
+# Query should include: {namespace="application"}
 
 # Check metric names are correct
 # In Prometheus, use "Metrics" dropdown to see available metrics
@@ -593,7 +593,7 @@ colima start --cpu 8 --memory 8 --disk 100
 kubectl get networkpolicy --all-namespaces
 
 # Temporarily disable for testing
-kubectl delete networkpolicy --all -n humor-game
+kubectl delete networkpolicy --all -n application
 
 # Check for CNI issues
 kubectl get pods -n kube-system | grep -E "(flannel|calico|weave)"
@@ -603,14 +603,14 @@ kubectl get pods -n kube-system | grep -E "(flannel|calico|weave)"
 ```bash
 # Check PV and PVC status
 kubectl get pv
-kubectl get pvc -n humor-game
+kubectl get pvc -n application
 kubectl get pvc -n monitoring
 
 # Check storage class
 kubectl get storageclass
 
 # Force recreate if needed
-kubectl delete pvc --all -n humor-game
+kubectl delete pvc --all -n application
 kubectl apply -f k8s/postgres.yaml
 ```
 
@@ -622,7 +622,7 @@ kubectl apply -f k8s/postgres.yaml
 kubectl get pods --all-namespaces
 
 # Specific namespace
-kubectl get pods -n humor-game
+kubectl get pods -n application
 kubectl get pods -n monitoring
 
 # Detailed pod info
@@ -635,14 +635,14 @@ kubectl describe pod <pod-name> -n <namespace>
 kubectl get svc --all-namespaces
 
 # Check specific service
-kubectl get svc backend -n humor-game
+kubectl get svc backend -n application
 kubectl get svc prometheus -n monitoring
 ```
 
 ### **Check Logs**
 ```bash
 # Backend logs
-kubectl logs -f deployment/backend -n humor-game
+kubectl logs -f deployment/backend -n application
 
 # Prometheus logs
 kubectl logs -f deployment/prometheus -n monitoring
@@ -786,7 +786,7 @@ lsof -ti:3001 | xargs kill -9
 # Restart port-forwards
 kubectl port-forward -n monitoring svc/grafana 3000:3000 &
 kubectl port-forward -n monitoring svc/prometheus 9090:9090 &
-kubectl port-forward -n humor-game svc/backend 3001:3001 &
+kubectl port-forward -n application svc/backend 3001:3001 &
 
 echo "Port-forwards restarted!"
 ```

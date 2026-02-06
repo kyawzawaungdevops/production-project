@@ -59,20 +59,20 @@ This document details the monitoring issues encountered during the home lab setu
 **Root Cause:** Incorrect Docker build and deployment process that didn't follow the home-lab.md specifications.
 
 **What Was Wrong:**
-- Building images with registry prefixes (`localhost:5001/humor-game-backend:latest`)
+- Building images with registry prefixes (`localhost:5001/application-backend:latest`)
 - Pushing to local registry instead of using local builds
 - Missing the critical `k3d image import` step
 
 **Correct Process (from home-lab.md):**
 ```bash
 # 1. Build locally (NO registry prefix)
-docker build -t humor-game-backend:latest ./backend
+docker build -t application-backend:latest ./backend
 
 # 2. Import to k3d (CRITICAL STEP!)
-k3d image import humor-game-backend:latest -c humor-game-cluster
+k3d image import application-backend:latest -c application-cluster
 
 # 3. Restart deployment
-kubectl rollout restart deployment/backend -n humor-game
+kubectl rollout restart deployment/backend -n application
 ```
 
 ### 4. Metrics Initialization Failures
@@ -131,22 +131,22 @@ curl -s "http://gameapp.local:8080/debug/test"
 ### Verify Docker Image Process
 ```bash
 # Check local images
-docker images | grep humor-game
+docker images | grep application
 
 # Import to k3d
-k3d image import humor-game-backend:latest -c humor-game-cluster
+k3d image import application-backend:latest -c application-cluster
 
 # Restart deployment
-kubectl rollout restart deployment/backend -n humor-game
+kubectl rollout restart deployment/backend -n application
 ```
 
 ### Check Pod Status
 ```bash
 # Verify pods are running
-kubectl get pods -n humor-game
+kubectl get pods -n application
 
 # Wait for readiness
-kubectl wait --for=condition=ready pod -l app=backend -n humor-game --timeout=120s
+kubectl wait --for=condition=ready pod -l app=backend -n application --timeout=120s
 ```
 
 ## Current Status
@@ -266,25 +266,25 @@ The Docker image build and deployment process was not following the specificatio
 **Incorrect Process That Was Being Used:**
 ```bash
 # WRONG: Building with registry prefix
-docker build -t localhost:5001/humor-game-backend:latest ./backend
+docker build -t localhost:5001/application-backend:latest ./backend
 
 # WRONG: Trying to push to local registry
-docker push localhost:5001/humor-game-backend:latest
+docker push localhost:5001/application-backend:latest
 
 # WRONG: Missing k3d image import step
-kubectl rollout restart deployment/backend -n humor-game
+kubectl rollout restart deployment/backend -n application
 ```
 
 **Correct Process Implementation (from home-lab.md):**
 ```bash
 # CORRECT: Build locally without registry prefix
-docker build -t humor-game-backend:latest ./backend
+docker build -t application-backend:latest ./backend
 
 # CORRECT: Import image directly to k3d cluster (CRITICAL STEP)
-k3d image import humor-game-backend:latest -c humor-game-cluster
+k3d image import application-backend:latest -c application-cluster
 
 # CORRECT: Restart deployment to use new image
-kubectl rollout restart deployment/backend -n humor-game
+kubectl rollout restart deployment/backend -n application
 ```
 
 **Why k3d Image Import is Critical:**
@@ -376,26 +376,26 @@ curl -s "http://gameapp.local:8080/debug/test"
 ### Verify Docker Image Process
 ```bash
 # Check that local images exist with correct names
-docker images | grep humor-game
-# Expected output: Images tagged as humor-game-backend:latest and humor-game-frontend:latest
+docker images | grep application
+# Expected output: Images tagged as application-backend:latest and application-frontend:latest
 
 # Import updated images to k3d cluster
-k3d image import humor-game-backend:latest -c humor-game-cluster
+k3d image import application-backend:latest -c application-cluster
 # Expected output: Successful import confirmation
 
 # Restart deployment to use new images
-kubectl rollout restart deployment/backend -n humor-game
+kubectl rollout restart deployment/backend -n application
 # Expected output: Deployment restart confirmation
 ```
 
 ### Check Pod Status and Readiness
 ```bash
 # Verify all pods are running and ready
-kubectl get pods -n humor-game
+kubectl get pods -n application
 # Expected output: All pods showing "1/1 Running" status
 
 # Wait for pods to be fully ready before testing
-kubectl wait --for=condition=ready pod -l app=backend -n humor-game --timeout=120s
+kubectl wait --for=condition=ready pod -l app=backend -n application --timeout=120s
 # Expected output: Condition met confirmation
 ```
 

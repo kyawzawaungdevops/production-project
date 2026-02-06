@@ -39,7 +39,7 @@ graph TB
     
     subgraph "☸️ Kubernetes Cluster"
         K8sCluster[☸️ Kubernetes Cluster<br/>Target Environment]
-        AppPods[📦 Application Pods<br/>humor-game namespace]
+        AppPods[📦 Application Pods<br/>application namespace]
         ConfigMaps[🗂️ ConfigMaps<br/>App Configuration]
         Secrets[🔐 Secrets<br/>Sensitive Data]
         Services[🔌 Services<br/>Network Access]
@@ -116,7 +116,7 @@ open http://localhost:8090
 ```
 
 **What You'll See:**
-- Application: `humor-game-monitor`
+- Application: `application-monitor`
 - Status: `OutOfSync` (normal)
 - Health: `Missing` (normal for initial setup)
 - Resources: 19 tracked
@@ -220,14 +220,14 @@ gitops-safe/
 apiVersion: argoproj.io/v1alpha1
 kind: AppProject
 metadata:
-  name: humor-game-safe
+  name: application-safe
   namespace: argocd
 spec:
   description: "Safe GitOps for Humor Game - Read Only"
   sourceRepos:
   - https://github.com/YOUR_USERNAME/YOUR_REPO
   destinations:
-  - namespace: humor-game
+  - namespace: application
     server: https://kubernetes.default.svc
   namespaceResourceWhitelist:
   - group: ""
@@ -249,17 +249,17 @@ spec:
 apiVersion: argoproj.io/v1alpha1
 kind: Application
 metadata:
-  name: humor-game-monitor
+  name: application-monitor
   namespace: argocd
 spec:
-  project: humor-game-safe
+  project: application-safe
   source:
     repoURL: https://github.com/YOUR_USERNAME/YOUR_REPO
     targetRevision: gitops
     path: gitops-safe/overlays/dev
   destination:
     server: https://kubernetes.default.svc
-    namespace: humor-game
+    namespace: application
   syncPolicy:
     automated: {}  # Manual sync only - SAFE!
     prune: false   # Don't delete anything
@@ -273,7 +273,7 @@ kubectl apply -f gitops-safe/argocd-project.yaml
 
 **Expected Output:**
 ```bash
-appproject.argoproj.io/humor-game-safe created
+appproject.argoproj.io/application-safe created
 ```
 
 # Apply ArgoCD application
@@ -281,7 +281,7 @@ kubectl apply -f gitops-safe/argocd-application.yaml
 
 **Expected Output:**
 ```bash
-application.argoproj.io/humor-game-monitor created
+application.argoproj.io/application-monitor created
 ```
 
 # Check status
@@ -290,7 +290,7 @@ kubectl get applications -n argocd
 **Expected Output:**
 ```bash
 NAME                 SYNC STATUS   HEALTH STATUS
-humor-game-monitor   OutOfSync     Missing
+application-monitor   OutOfSync     Missing
 ```
 ```
 
@@ -301,7 +301,7 @@ humor-game-monitor   OutOfSync     Missing
 2. Login with:
    - **Username:** `admin`
    - **Password:** `EouvoDGN7grkK-Ag`
-3. Look for `humor-game-monitor` application
+3. Look for `application-monitor` application
 4. Should show **APP HEALTH: Missing** ⚠️ (normal for initial setup)
 5. **SYNC STATUS: OutOfSync** (this is normal and expected)
 
@@ -309,7 +309,7 @@ humor-game-monitor   OutOfSync     Missing
 
 **Check Resource Count:**
 ```bash
-kubectl describe application humor-game-monitor -n argocd | grep "Kind:" | wc -l
+kubectl describe application application-monitor -n argocd | grep "Kind:" | wc -l
 # Should show 19 resources being tracked
 ```
 
@@ -336,7 +336,7 @@ When you see "Missing" in ArgoCD, it means:
 
 **Option 1: Manual Sync via UI (Recommended for Learning)**
 1. Go to http://localhost:8090
-2. Click on `humor-game-monitor` application
+2. Click on `application-monitor` application
 3. Click the **"SYNC"** button (blue button at top)
 4. Review what will change
 5. Click **"SYNCHRONIZE"**
@@ -345,16 +345,16 @@ When you see "Missing" in ArgoCD, it means:
 **Option 2: Manual Sync via Command Line**
 ```bash
 # Trigger a one-time sync
-kubectl patch application humor-game-monitor -n argocd --type='merge' -p='{"operation":{"sync":{}}}'
+kubectl patch application application-monitor -n argocd --type='merge' -p='{"operation":{"sync":{}}}'
 ```
 
 **Option 3: Enable Auto-Sync (Production Pattern)**
 ```bash
 # Enable automatic synchronization
-kubectl patch application humor-game-monitor -n argocd --type='merge' -p='{"spec":{"syncPolicy":{"automated":{}}}}'
+kubectl patch application application-monitor -n argocd --type='merge' -p='{"spec":{"syncPolicy":{"automated":{}}}}'
 
 # Check if auto-sync worked
-kubectl get application humor-game-monitor -n argocd
+kubectl get application application-monitor -n argocd
 # Should show "Synced" status
 ```
 
@@ -373,13 +373,13 @@ git commit -m "Test GitOps change"
 git push origin gitops
 
 # Watch ArgoCD detect the change
-kubectl get application humor-game-monitor -n argocd
+kubectl get application application-monitor -n argocd
 # Should show OutOfSync status
 
 **Expected Output:**
 ```bash
 NAME                 SYNC STATUS   HEALTH STATUS
-humor-game-monitor   OutOfSync     Missing
+application-monitor   OutOfSync     Missing
 ```
 ```
 
@@ -397,7 +397,7 @@ deployment.apps/argocd-server created
 **ArgoCD Status:**
 ```
 NAME                 SYNC STATUS   HEALTH STATUS
-humor-game-monitor   OutOfSync     Missing
+application-monitor   OutOfSync     Missing
 ```
 
 **Resource Count:**
@@ -427,23 +427,23 @@ Your GitOps workflow is working when:
 **Command to confirm:** Check what's actually running
 ```bash
 # Check if your apps are actually running (they should be!)
-kubectl get pods -n humor-game
+kubectl get pods -n application
 # Expected: backend, frontend, postgres, redis pods "Running"
 
 # Check what ArgoCD expects vs what exists
-kubectl describe application humor-game-monitor -n argocd | grep "Status.*OutOfSync" | wc -l
+kubectl describe application application-monitor -n argocd | grep "Status.*OutOfSync" | wc -l
 # Expected: Shows number of differing resources
 ```
 **Fix:** Sync the application to make cluster match Git
 ```bash
 # Option 1: Use ArgoCD UI (Recommended)
-# Go to http://localhost:8090, click "humor-game-monitor", click "SYNC"
+# Go to http://localhost:8090, click "application-monitor", click "SYNC"
 
 # Option 2: Command line sync
-kubectl patch application humor-game-monitor -n argocd --type='merge' -p='{"operation":{"sync":{}}}'
+kubectl patch application application-monitor -n argocd --type='merge' -p='{"operation":{"sync":{}}}'
 
 # Option 3: Enable auto-sync
-kubectl patch application humor-game-monitor -n argocd --type='merge' -p='{"spec":{"syncPolicy":{"automated":{}}}}'
+kubectl patch application application-monitor -n argocd --type='merge' -p='{"spec":{"syncPolicy":{"automated":{}}}}'
 ```
 
 ### Symptom: ArgoCD shows "Unknown" status
@@ -461,17 +461,17 @@ kubectl patch application humor-game-monitor -n argocd --type='merge' -p='{"spec
 
 ### Symptom: Application won't sync
 **Cause:** Application configuration issues or ArgoCD controller problems
-**Command to confirm:** `kubectl describe application humor-game-monitor -n argocd`
+**Command to confirm:** `kubectl describe application application-monitor -n argocd`
 **Fix:**
 ```bash
 # Check application configuration
-kubectl describe application humor-game-monitor -n argocd
+kubectl describe application application-monitor -n argocd
 
 # Check ArgoCD logs
 kubectl logs deployment/argocd-application-controller -n argocd
 
 # Manual sync from UI or CLI
-argocd app sync humor-game-monitor
+argocd app sync application-monitor
 ```
 
 ### Symptom: Kustomization errors
@@ -493,10 +493,10 @@ If you need to start over or fix issues:
 
 ```bash
 # Remove ArgoCD application
-kubectl delete application humor-game-monitor -n argocd
+kubectl delete application application-monitor -n argocd
 
 # Remove ArgoCD project
-kubectl delete appproject humor-game-safe -n argocd
+kubectl delete appproject application-safe -n argocd
 
 # Reset ArgoCD to factory defaults (nuclear option)
 kubectl delete namespace argocd
@@ -582,13 +582,13 @@ You've implemented professional GitOps workflows:
 **✅ What We Accomplished:**
 - ArgoCD installed and running with all components healthy
 - GitHub repository configured (public access)
-- Application `humor-game-monitor` tracking 19 resources
+- Application `application-monitor` tracking 19 resources
 - GitOps workflow operational and monitoring cluster state
 
 **✅ Current Status:**
 - **ArgoCD UI:** http://localhost:8090 (GitOps Management)
 - **Login:** admin / EouvoDGN7grkK-Ag  
-- **Application:** humor-game-monitor
+- **Application:** application-monitor
 - **Sync Status:** OutOfSync (expected)
 - **Health Status:** Missing (normal for monitoring setup)
 - **Resources Tracked:** 19

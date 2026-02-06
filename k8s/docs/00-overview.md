@@ -47,8 +47,8 @@ A complete production application stack featuring:
 |-----------|------|-------------------|----------|
 | **0. Setup** | Tools ready | Install Docker/Colima, kubectl, k3d, Helm, Node, jq | 15-30 min |
 | **1. Compose** | App works locally | Docker Compose with postgres, redis, backend, frontend services | 20-40 min |
-| **2. K8s Core** | App on k3d | Kubernetes deployment to humor-game namespace | 30-60 min |
-| **3. Ingress** | Prod-style access | humor-game-nginx controller with gameapp.local and gameapp.games | 20-40 min |
+| **2. K8s Core** | App on k3d | Kubernetes deployment to application namespace | 30-60 min |
+| **3. Ingress** | Prod-style access | application-nginx controller with gameapp.local and gameapp.games | 20-40 min |
 | **4. Observability** | See/measure | Prometheus and Grafana in monitoring namespace | 45-90 min |
 | **5. GitOps** | Automate | ArgoCD in argocd namespace for automated deployments | 30-60 min |
 | **6. Global** | Ship worldwide | Cloudflare tunnel with app.gameapp.games, prometheus.gameapp.games, grafana.gameapp.games | 60-120 min |
@@ -56,7 +56,7 @@ A complete production application stack featuring:
 ## Success Metrics
 
 **By the end, you'll have:**
-- ✅ **4 pods running** in humor-game namespace (postgres, redis, backend, frontend)
+- ✅ **4 pods running** in application namespace (postgres, redis, backend, frontend)
 - ✅ **Monitoring stack** in monitoring namespace (prometheus, grafana)
 - ✅ **GitOps automation** in argocd namespace
 - ✅ **Global access** via Cloudflare CDN
@@ -73,7 +73,7 @@ A complete production application stack featuring:
 **Infrastructure Layer:**
 - **Containerization**: Docker & Docker Compose
 - **Orchestration**: Kubernetes (k3d)
-- **Ingress**: humor-game-nginx controller
+- **Ingress**: application-nginx controller
 - **Monitoring**: Prometheus (port 9090) + Grafana (port 3000)
 - **GitOps**: ArgoCD
 - **CDN**: Cloudflare

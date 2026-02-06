@@ -16,7 +16,7 @@ fi
 # Check if k3d is running
 if ! kubectl cluster-info &> /dev/null; then
     echo "❌ Kubernetes cluster not accessible. Please start your cluster first."
-    echo "   Run: k3d cluster start humor-game"
+    echo "   Run: k3d cluster start application"
     exit 1
 fi
 
@@ -67,8 +67,8 @@ add_local_dns() {
 
 # Get ingress controller IP
 echo "🔍 Getting ingress controller IP..."
-INGRESS_IP=$(kubectl get svc -n ingress-nginx humor-game-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || \
-              kubectl get svc -n ingress-nginx humor-game-nginx-controller -o jsonpath='{.spec.clusterIP}' 2>/dev/null || \
+INGRESS_IP=$(kubectl get svc -n ingress-nginx application-nginx-controller -o jsonpath='{.status.loadBalancer.ingress[0].ip}' 2>/dev/null || \
+              kubectl get svc -n ingress-nginx application-nginx-controller -o jsonpath='{.spec.clusterIP}' 2>/dev/null || \
               kubectl get nodes -o jsonpath='{.items[0].status.addresses[?(@.type=="InternalIP")].address}' 2>/dev/null)
 
 if [ -z "$INGRESS_IP" ]; then
