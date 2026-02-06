@@ -1,7 +1,7 @@
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: kanghanna-deployment
+  name: backend-deployment
   namespace: application
 spec:
   replicas: 4
