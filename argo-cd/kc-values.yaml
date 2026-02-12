@@ -1,0 +1,52 @@
+# Global PostgreSQL settings (Used by Keycloak to connect to the DB)
+global:
+  postgresql:
+    auth:
+      username: bn_keycloak
+      password: bn_keycloak
+      database: bitnami_keycloak
+
+# Keycloak Admin User Configuration
+auth:
+  adminUser: admin
+  adminPassword: admin
+
+# PostgreSQL Specific Configuration (The database sub-chart)
+postgresql:
+  enabled: true
+  auth:
+    username: bn_keycloak
+    password: bn_keycloak
+    database: bitnami_keycloak
+
+  # --- FIX FOR FAILED SCHEDULING (PVC BINDING) ---
+  # These settings tell the PostgreSQL sub-chart how to provision storage.
+  primary:
+    persistence:
+      enabled: true
+      storageClass: local-path # <--- CHANGE THIS TO YOUR ACTUAL STORAGE CLASS (e.g., local-path, gp2, etc.)
+      size: 8Gi # Default size request for the volume
+  # ------------------------------------------------
+
+# Kubernetes Service Configuration
+service:
+  type: NodePort
+  nodePorts:
+    http: 30080
+
+# Additional Keycloak Environment Variables (KC_ prefix is common for Keycloak 17+)
+extraEnvVars:
+  # Enable production mode to prevent thread blocking
+  - name: KC_PRODUCTION
+    value: "true"
+
+  - name: KC_HOSTNAME_STRICT
+    value: "false" # Allows access without strict hostname matching
+  - name: KC_HTTP_ENABLED
+    value: "true" # Explicitly enables HTTP access
+
+  # Environment variables for configuring the Vert.x thread pools
+  - name: VERTX_WORKER_POOL_SIZE
+    value: "20"
+  - name: VERTX_EVENT_LOOP_POOL_SIZE
+    value: "8"
