@@ -1,6 +1,6 @@
 annotations:
   artifacthub.io/changes: |
-    - kind: changed
+    - kind: test
       description: behavior of -n is non-portable and may change in future; use --update=none instead
   artifacthub.io/signKey: |
     fingerprint: 2B8F22F57260EFA67BE1C5824B11F800CD9D2252
