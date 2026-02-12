@@ -15,7 +15,7 @@ spec:
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "3001"
-        prometheus.io/path: "/metrics"
+        prometheus.io/path: "this is new metrics"
     spec:
       containers:
         - name: backend
@@ -98,6 +98,7 @@ spec:
     app: backend
   ports:
     - port: 3001
+
 
 
 
