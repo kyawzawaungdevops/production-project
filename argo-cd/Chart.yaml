@@ -8,7 +8,7 @@ annotations:
 apiVersion: v2
 appVersion: v3.2.1
 dependencies:
-- condition: redis-ha.enable
+- condition: redis-ha.enabletest
   name: redis-ha
   repository: https://dandydeveloper.github.io/charts/
   version: 4.34.11
