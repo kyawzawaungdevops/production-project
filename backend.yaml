@@ -7,7 +7,7 @@ spec:
   replicas: 4
   selector:
     matchLabels:
-      app: backendtest
+      app: backend-service
   template:
     metadata:
       labels:
