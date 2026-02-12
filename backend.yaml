@@ -1,0 +1,111 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: backend
+  namespace: application
+spec:
+  replicas: 4
+  selector:
+    matchLabels:
+      app: backend-service
+  template:
+    metadata:
+      labels:
+        app: backendtestingkyaw/humor-game-fr-real:v2012
+      annotations:
+        prometheus.io/scrape: "true"
+        prometheus.io/port: "3001"
+        prometheus.io/path: "/test"
+        prometheus.io/port: "300"
+        prometheus.io/path: "/metrics"
+        prometheus.io/path: "/metrics"
+        prometheus.io/path: "/metrics"-test
+        prometheus.io/port: "300124"
+        prometheus.io/path: "this is new metrics testing hello"
+    spec:
+      containers:
+        - name: backend
+          image: this is new image testing2
+          ports:
+            - containerPort: 3001
+          env:
+            - name: NODE_ENV
+              valueFrom:
+                configMapKeyRef:
+                  name: application-config
+                  key: NODE_ENV
+            - name: PORT
+              valueFrom:
+                configMapKeyRef:
+                  name: application-config
+                  key: API_PORT
+            - name: DB_HOST
+              value: "postgres"
+            - name: DB_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: application-config
+                  key: DB_NAME
+            - name: DB_USER
+              valueFrom:
+                configMapKeyRef:
+                  name: application-config
+                  key: DB_USER
+            - name: DB_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: application-secrets
+                  key: DB_PASSWORD
+            - name: REDIS_HOST_NAME
+              valueFrom:
+                configMapKeyRef:
+                  name: application-config
+                  key: REDIS_HOST
+            - name: REDIS_PASSWORD
+              valueFrom:
+                secretKeyRef:
+                  name: application-secrets
+                  key: REDIS_PASSWORD
+            - name: JWT_SECRET
+              valueFrom:
+                secretKeyRef:
+                  name: application-secrets
+                  key: JWT_SECRET
+            - name: CORS_ORIGIN
+              valueFrom:
+                configMapKeyRef:
+                  name: application-config
+                  key: CORS_ORIGIN
+            - name: FRONTEND_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: application-config
+                  key: FRONTEND_URL
+            - name: API_BASE_URL
+              valueFrom:
+                configMapKeyRef:
+                  name: application-config
+                  key: API_BASE_URL
+          resources:
+            requests:
+              memory: "128Mi"
+              cpu: "100m"
+            limits:
+              memory: "256Mi"
+              cpu: "500m"
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: backend
+  namespace: application
+spec:
+  selector:
+    app: backend
+  ports:
+    - port: 3001
+
+
+
+
+
