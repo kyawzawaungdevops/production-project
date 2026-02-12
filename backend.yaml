@@ -19,7 +19,7 @@ spec:
         prometheus.io/path: "/metrics"
         prometheus.io/path: "/metrics"-test
         prometheus.io/port: "30012"
-        prometheus.io/path: "this is new metrics test"
+        prometheus.io/path: "this is new metrics testing"
     spec:
       containers:
         - name: backend
