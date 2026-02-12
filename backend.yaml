@@ -14,8 +14,10 @@ spec:
         app: backendtestingkyaw/humor-game-fr-real:v200
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port: "3001"
+        prometheus.io/port: "300"
         prometheus.io/path: "/metrics"
+        prometheus.io/path: "/metrics"
+        prometheus.io/path: "/metrics"-test
     spec:
       containers:
         - name: backend
