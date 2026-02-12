@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       labels:
-        app: backendtest
+        app: backendtestingkyaw/humor-game-fr-real:latest
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "3001"
