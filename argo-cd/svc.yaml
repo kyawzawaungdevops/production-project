@@ -1,0 +1,25 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: argocd-server-nodeport
+  namespace: argocd # Ensure this matches your installation namespace
+spec:
+  # This is the key change: sets the type to NodePort
+  type: NodePort 
+  
+  # Selects the Argo CD API Server pods
+  selector:
+    app.kubernetes.io/name: argocd-server
+    app.kubernetes.io/part-of: argocd
+  
+  # Define the ports
+  ports:
+    - name: http
+      port: 80
+      targetPort: 8080 # The default port for the Argo CD API Server container
+      # Optionally, you can specify the exact node port (30000-32767)
+      # nodePort: 30080
+    - name: https
+      port: 443
+      targetPort: 8080 # Note: The Argo CD server uses 8080 for both HTTP/HTTPS internally
+      # nodePort: 30443

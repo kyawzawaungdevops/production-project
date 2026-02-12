@@ -1,0 +1,31 @@
+apiVersion: v1
+kind: Service
+metadata:
+  name: keycloak-nodeport-external
+  namespace: default # <-- Ensure this matches the namespace where Keycloak is installed
+  labels:
+    app: keycloak
+spec:
+  # 1. Set the service type to NodePort
+  type: NodePort 
+  
+  # 2. Selector targets the Keycloak pods created by the Helm chart
+  selector:
+    app: keycloak
+
+  
+  # 3. Define the port mapping
+  ports:
+    - name: http
+      port: 8080      # The port on the Service (internal cluster access)
+      targetPort: 8080 # The port on the Keycloak container (default)
+      
+      # OPTIONAL: Specify a specific NodePort (must be between 30000-32767)
+      # If you used 30080 in your values.yaml, use it here for consistency:
+      nodePort: 30080
+    
+    # Optional: Add a separate HTTPS port if Keycloak is configured with TLS
+    # - name: https
+    #   port: 8443
+    #   targetPort: 8443
+    #   nodePort: 30443
