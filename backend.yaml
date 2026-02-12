@@ -4,23 +4,28 @@ metadata:
   name: backend
   namespace: application
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
-      app: backend
+      app: backend-service
   template:
     metadata:
       labels:
-        app: backendtestingkyaw/humor-game-fr-real:latest
+        app: backendtestingkyaw/humor-game-fr-real:v200
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "3001"
         prometheus.io/path: "/test"
+        prometheus.io/port: "300"
+        prometheus.io/path: "/metrics"
+        prometheus.io/path: "/metrics"
+        prometheus.io/path: "/metrics"-test
+        prometheus.io/port: "300124"
+        prometheus.io/path: "this is new metrics testing hello"
     spec:
       containers:
         - name: backend
-          image: testingkyaw/humor-game-fr-real:latest
-          imagePullPolicy: Always
+          image: this is new image testing
           ports:
             - containerPort: 3001
           env:
@@ -99,4 +104,8 @@ spec:
     app: backend
   ports:
     - port: 3001
+
+
+
+
 
