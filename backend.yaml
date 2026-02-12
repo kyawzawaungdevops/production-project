@@ -4,7 +4,7 @@ metadata:
   name: backend
   namespace: application
 spec:
-  replicas: 1
+  replicas: 4
   selector:
     matchLabels:
       app: backend-service
@@ -15,12 +15,11 @@ spec:
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "3001"
-        prometheus.io/path: "/metrics"
+        prometheus.io/path: "this is new metrics test"
     spec:
       containers:
         - name: backend
-          image: testingkyaw/humor-game-fr-real:latest
-          imagePullPolicy: Always
+          image: this is new image test
           ports:
             - containerPort: 3001
           env:
@@ -99,4 +98,8 @@ spec:
     app: backend
   ports:
     - port: 3001
+
+
+
+
 

@@ -3,8 +3,8 @@
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:15-alpine
-    container_name: application-postgres
+    image: postgres:15-alpine2
+    container_name: application-postgrest
     restart: unless-stopped
     environment:
       POSTGRES_DB: ${DB_NAME:-humor_memory_game}
@@ -235,4 +235,6 @@ networks:
 #   postgres_data:
 #     driver: local
 #   redis_data:
+
 #     driver: local
+
