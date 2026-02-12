@@ -7,15 +7,19 @@ spec:
   replicas: 4
   selector:
     matchLabels:
-      app: backendtest
+      app: backend-service
   template:
     metadata:
       labels:
-        app: backendtest344
+        app: backendtestingkyaw/humor-game-fr-real:v200
       annotations:
         prometheus.io/scrape: "true"
-        prometheus.io/port: "3001"
-        prometheus.io/path: "this is new metrics test"
+        prometheus.io/port: "300"
+        prometheus.io/path: "/metrics"
+        prometheus.io/path: "/metrics"
+        prometheus.io/path: "/metrics"-test
+        prometheus.io/port: "30012"
+        prometheus.io/path: "this is new metrics testing"
     spec:
       containers:
         - name: backend
@@ -98,6 +102,7 @@ spec:
     app: backend
   ports:
     - port: 3001
+
 
 
 
