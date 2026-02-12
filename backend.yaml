@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       labels:
-        app: backendtest34
+        app: backendtest344
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "3001"
@@ -99,4 +99,5 @@ spec:
     app: backend
   ports:
     - port: 3001
+
 
