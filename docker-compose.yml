@@ -3,7 +3,7 @@
 services:
   # PostgreSQL Database
   postgres:
-    image: postgres:15-alpine
+    image: postgres:15-alpine2
     container_name: application-postgres
     restart: unless-stopped
     environment:
@@ -235,4 +235,5 @@ networks:
 #   postgres_data:
 #     driver: local
 #   redis_data:
+
 #     driver: local
