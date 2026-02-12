@@ -11,7 +11,7 @@ spec:
   template:
     metadata:
       labels:
-        app: backendtestingkyaw/humor-game-fr-real:v4
+        app: backendtestingkyaw/humor-game-fr-real:v22
       annotations:
         prometheus.io/scrape: "true"
         prometheus.io/port: "3001"
