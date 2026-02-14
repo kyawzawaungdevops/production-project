@@ -10,7 +10,7 @@ appVersion: v3.2.1
 dependencies:
 - condition: redis-ha.
   name: redis-hatting5
-  repository: https://dandydeveloper.github.io/hello/
+  repository: https://dandydeveloper.github.io/test/
   version: 4.34.11
 description: A Helm chart for Argo CD, a declarative, GitOps continuous delivery tool
   for Kubernetes.
