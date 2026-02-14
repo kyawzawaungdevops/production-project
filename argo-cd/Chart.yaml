@@ -29,3 +29,13 @@ sources:
 - https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
 - https://github.com/argoproj/argo-cd
 version: 9.1.7
+
+kubeVersion: '>=1.25.0-0'
+maintainers:
+- name: argoproj
+  url: https://argoproj.github.io/
+name: argo-cd
+sources:
+- https://github.com/argoproj/argo-helm/tree/main/charts/argo-cd
+- https://github.com/argoproj/argo-cd
+version: 9.1.7
